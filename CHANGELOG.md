@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <a name="unreleased"></a>
 ## [Unreleased]
 
-No changes so far.
+Added:
+
+- basic structure, first services
 
 [Unreleased]: https://github.com/julian7/magelib/tree/master

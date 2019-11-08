@@ -1,0 +1,20 @@
+---
+setup:
+  -
+    type: project
+    name: magelib
+    target: target
+builds:
+  -
+    type: go
+    ldflags: "-s -w -X main.version={{.Version}}"
+    main: ./cmd/builder
+    output: "builder{{.Ext}}"
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+archives:
+  - type: show
