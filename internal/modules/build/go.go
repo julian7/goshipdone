@@ -65,6 +65,7 @@ type (
 		Arch    string
 		Env     map[string]string
 		LDFlags string
+		OutDir  string
 		Main    string
 		Name    string
 		OS      string
@@ -174,16 +175,15 @@ func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, er
 		target *string
 	}{
 		{"ldflags", rt.Go.LDFlags, &tar.LDFlags},
-		{"output", path.Join(
+		{"location", path.Join(
 			tar.Context.TargetDir,
-			"{{.ProjectName}}-{{.OS}}-{{.Arch}}",
-			rt.Go.Output,
-		), &tar.Output},
+			"{{.ProjectName}}-{{.OS}}-{{.Arch}}"), &tar.OutDir},
+		{"output", rt.Go.Output, &tar.Output},
 	}
 
 	for _, item := range tasks {
 		(*item.target), err = td.Parse(
-			fmt.Sprintf("buildgo-%s-%s-%s-%s", rt.Go.Main, goos, goarch, item.name),
+			fmt.Sprintf("buildgo-%s-%s-%s-%s", rt.Go.Name, goos, goarch, item.name),
 			item.source,
 		)
 		if err != nil {
@@ -195,13 +195,14 @@ func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, er
 }
 
 func (tar *goSingleTarget) build() error {
-	err := sh.RunWith(tar.Env, mg.GoCmd(), "build", "-o", tar.Output, "-ldflags", tar.LDFlags, tar.Main)
+	output := path.Join(tar.OutDir, tar.Output)
+	err := sh.RunWith(tar.Env, mg.GoCmd(), "build", "-o", output, "-ldflags", tar.LDFlags, tar.Main)
 	if err != nil {
-		_ = sh.Rm(tar.Output)
+		_ = sh.Rm(output)
 		return err
 	}
 
-	tar.Artifacts.Add(ctx.FormatRaw, tar.Name, tar.Output, tar.OS, tar.Arch)
+	tar.Artifacts.Add(ctx.FormatRaw, tar.Name, tar.OutDir, output, tar.OS, tar.Arch)
 
 	return nil
 }

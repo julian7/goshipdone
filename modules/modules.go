@@ -124,7 +124,7 @@ func (mod *Modules) Run(context *ctx.Context) error {
 		}
 
 		if err := module.Pluggable.Run(context); err != nil {
-			return fmt.Errorf("error in %s / %s: %w", mod.Stage, module.Type, err)
+			return fmt.Errorf("%s:%s: %w", mod.Stage, module.Type, err)
 		}
 
 		fmt.Printf("----< %s done\n", module.Type)

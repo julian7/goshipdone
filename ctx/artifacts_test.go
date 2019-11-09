@@ -8,6 +8,7 @@ func TestArtifacts_Add(t *testing.T) {
 	type args struct {
 		format   int
 		name     string
+		location string
 		filename string
 		os       string
 		arch     string
@@ -19,21 +20,23 @@ func TestArtifacts_Add(t *testing.T) {
 		wantsCount int
 	}{
 		{
-			"first",
-			nil,
-			args{1, "default", "dist/default", "linux", "amd64"},
-			1,
+			name:       "first",
+			artifacts:  nil,
+			args:       args{format: 1, name: "default", location: "dist", filename: "dist/default", os: "linux", arch: "amd64"},
+			wantsCount: 1,
 		},
 		{
-			"second",
-			Artifacts{&Artifact{"dist/default", 1, "default", "windows", "amd64"}},
-			args{1, "default", "dist/default", "linux", "amd64"},
-			2,
+			name: "second",
+			artifacts: Artifacts{
+				&Artifact{Filename: "dist/default", Format: 1, Location: "dist", Name: "default", OS: "windows", Arch: "amd64"},
+			},
+			args:       args{format: 1, name: "default", location: "dist", filename: "dist/default", os: "linux", arch: "amd64"},
+			wantsCount: 2,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.artifacts.Add(tt.args.format, tt.args.name, tt.args.filename, tt.args.os, tt.args.arch)
+			tt.artifacts.Add(tt.args.format, tt.args.name, tt.args.location, tt.args.filename, tt.args.os, tt.args.arch)
 
 			noArtifacts := len(tt.artifacts)
 			if noArtifacts != tt.wantsCount {
@@ -67,7 +70,7 @@ func TestArtifacts_ByName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.Artifacts.ByName(tt.nameArg); len(got) != tt.wantCount {
+			if got := tt.Artifacts.ByName(tt.nameArg); len(*got) != tt.wantCount {
 				t.Errorf("Artifacts.ByName() = %v, want %v item(s)", got, tt.wantCount)
 			}
 		})

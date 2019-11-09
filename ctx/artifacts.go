@@ -1,5 +1,7 @@
 package ctx
 
+import "fmt"
+
 const (
 	_ = iota
 	// FormatRaw represents an artifact in its pristine format (eg. binary or ar archive)
@@ -22,32 +24,39 @@ type (
 	// be further processed by later steps (eg. a build result put into
 	// an archive)
 	Artifact struct {
+		Arch     string
 		Filename string
 		Format   int
+		Location string
 		Name     string
 		OS       string
-		Arch     string
 	}
 )
 
 // Add registers a new artifact in Artifacts
-func (arts *Artifacts) Add(format int, name, filename, os, arch string) {
+func (arts *Artifacts) Add(format int, name, location, filename, os, arch string) {
 	*arts = append(*arts, &Artifact{
-		Format:   format,
-		Name:     name,
-		Filename: filename,
-		OS:       os,
 		Arch:     arch,
+		Filename: filename,
+		Format:   format,
+		Location: location,
+		Name:     name,
+		OS:       os,
 	})
 }
 
 // ByName searches artifacts by their build names
-func (arts *Artifacts) ByName(name string) Artifacts {
-	results := Artifacts{}
+func (arts *Artifacts) ByName(name string) *Artifacts {
+	results := &Artifacts{}
 	for i := range *arts {
 		if (*arts)[i].Name == name {
-			results = append(results, (*arts)[i])
+			*results = append(*results, (*arts)[i])
 		}
 	}
 	return results
+}
+
+// OsArch returns artifact's os-arch string
+func (art *Artifact) OsArch() string {
+	return fmt.Sprintf("%s-%s", art.OS, art.Arch)
 }

@@ -37,13 +37,13 @@ func (archive *UPX) Run(context *ctx.Context) error {
 	}
 
 	artifacts := context.Artifacts.ByName(archive.Build)
-	if len(artifacts) == 0 {
+	if len(*artifacts) == 0 {
 		return nil
 	}
 
-	args := make([]string, len(artifacts))
+	args := make([]string, len(*artifacts))
 
-	for i, artifact := range artifacts {
+	for i, artifact := range *artifacts {
 		args[i] = artifact.Filename
 	}
 
@@ -51,7 +51,7 @@ func (archive *UPX) Run(context *ctx.Context) error {
 		return err
 	}
 
-	for _, artifact := range artifacts {
+	for _, artifact := range *artifacts {
 		artifact.Format = ctx.FormatUPX
 	}
 
