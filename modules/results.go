@@ -46,3 +46,13 @@ func (res *Results) AddArtifact(format int, name, filename, os, arch string) {
 		Arch:     arch,
 	})
 }
+
+func (res *Results) ArtifactsByName(name string) []*Artifact {
+	artifacts := []*Artifact{}
+	for i := range res.Artifacts {
+		if res.Artifacts[i].Name == name {
+			artifacts = append(artifacts, &res.Artifacts[i])
+		}
+	}
+	return artifacts
+}

@@ -5,10 +5,10 @@ setup:
     name: magelib
     target: target
 builds:
-  -
-    type: go
+  - type: go
     ldflags: "-s -w -X main.version={{.Version}}"
     main: ./cmd/builder
+    name: builder
     output: "builder{{.Ext}}"
     goos:
       - darwin
@@ -17,4 +17,7 @@ builds:
     goarch:
       - amd64
 archives:
+  - type: show
+  - type: upx
+    name: builder
   - type: show

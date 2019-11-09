@@ -4,7 +4,6 @@ setup:
 
 - [x] project settings
 - [x] git tag detection
-- [ ] upx check
 
 build:
 
@@ -14,8 +13,7 @@ build:
 
 archive:
 
-- [ ] raw
-- [ ] upx
+- [x] upx
 - [ ] gzip
 - [ ] tar
 - [ ] zip

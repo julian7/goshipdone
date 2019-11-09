@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Added:
 
+- archive:upx
 - basic structure, first services
 
 [Unreleased]: https://github.com/julian7/magelib/tree/master
