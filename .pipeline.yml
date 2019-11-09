@@ -20,4 +20,8 @@ archives:
   - type: show
   - type: upx
     build: builder
+  - type: tar
+    builds:
+      - builder
+    compression: gzip
   - type: show
