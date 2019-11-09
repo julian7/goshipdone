@@ -3,6 +3,7 @@ package archive
 import (
 	"os/exec"
 
+	"github.com/julian7/magelib/ctx"
 	"github.com/julian7/magelib/modules"
 	"github.com/magefile/mage/sh"
 )
@@ -10,10 +11,12 @@ import (
 // UPX is a module for compressing executable binaries in a self-extracting
 // format using `upx` tool.
 type UPX struct {
-	Name string
+	// Build specifies a single build name to find related artifacts to
+	// modify.
+	Build string
 }
 
-//nolint: // nolint: gochecknoinits
+//nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.PluggableModule{
 		Kind:    "archive:upx",
@@ -22,17 +25,18 @@ func init() {
 }
 
 func NewUPX() modules.Pluggable {
-	return &UPX{Name: "default"}
+	return &UPX{Build: "default"}
 }
 
-func (archive *UPX) Run(results *modules.Results) error {
+// Run calls upx on built artifacts, changing their artifact types
+func (archive *UPX) Run(context *ctx.Context) error {
 	upxCmd, err := exec.LookPath("upx")
 
 	if err != nil {
 		return err
 	}
 
-	artifacts := results.ArtifactsByName(archive.Name)
+	artifacts := context.Artifacts.ByName(archive.Build)
 	if len(artifacts) == 0 {
 		return nil
 	}
@@ -48,7 +52,7 @@ func (archive *UPX) Run(results *modules.Results) error {
 	}
 
 	for _, artifact := range artifacts {
-		artifact.Format = modules.FormatUPX
+		artifact.Format = ctx.FormatUPX
 	}
 
 	return nil

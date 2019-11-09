@@ -3,6 +3,7 @@ package archive
 import (
 	"fmt"
 
+	"github.com/julian7/magelib/ctx"
 	"github.com/julian7/magelib/modules"
 )
 
@@ -23,8 +24,8 @@ func NewShow() modules.Pluggable {
 }
 
 // Run provides a list of artifacts recorded so far
-func (Show) Run(results *modules.Results) error {
-	for _, art := range results.Artifacts {
+func (Show) Run(context *ctx.Context) error {
+	for _, art := range context.Artifacts {
 		fmt.Printf("- %+v\n", art)
 	}
 

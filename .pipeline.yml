@@ -19,5 +19,5 @@ builds:
 archives:
   - type: show
   - type: upx
-    name: builder
+    build: builder
   - type: show

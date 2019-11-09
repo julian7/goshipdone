@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
+	"github.com/julian7/magelib/ctx"
 	_ "github.com/julian7/magelib/internal/modules/archive"
 	_ "github.com/julian7/magelib/internal/modules/build"
 	"github.com/julian7/magelib/internal/modules/setup"
@@ -23,7 +24,7 @@ func testPluggableModuleFactory() modules.Pluggable {
 	return &testPluggableModule{}
 }
 
-func (mod *testPluggableModule) Run(*modules.Results) error {
+func (mod *testPluggableModule) Run(*ctx.Context) error {
 	if mod.reporter != nil {
 		mod.reporter()
 	}
@@ -37,7 +38,7 @@ func testFailingPluggableModuleFactory() modules.Pluggable {
 	return &testFailingPluggableModule{}
 }
 
-func (mod *testFailingPluggableModule) Run(*modules.Results) error {
+func (mod *testFailingPluggableModule) Run(*ctx.Context) error {
 	return errors.New("error")
 }
 

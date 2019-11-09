@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/julian7/magelib/ctx"
 	"gopkg.in/yaml.v3"
 )
 
 type (
 	// Pluggable is a module, which can be pluggable into a pipeline
 	Pluggable interface {
-		Run(*Results) error
+		Run(*ctx.Context) error
 	}
 
 	// Modules is a list of Module-s of a single stage
@@ -107,7 +108,7 @@ func (mod *Modules) String() string {
 
 // Run goes through all internally loaded modules, and run them
 // one by one.
-func (mod *Modules) Run(results *Results) error {
+func (mod *Modules) Run(context *ctx.Context) error {
 	fmt.Printf("====> %s\n", strings.ToUpper(mod.Stage))
 
 	for _, module := range mod.Modules {
@@ -122,7 +123,7 @@ func (mod *Modules) Run(results *Results) error {
 			return fmt.Errorf("missing dependencies: %s", strings.Join(missing, ", "))
 		}
 
-		if err := module.Pluggable.Run(results); err != nil {
+		if err := module.Pluggable.Run(context); err != nil {
 			return fmt.Errorf("error in %s / %s: %w", mod.Stage, module.Type, err)
 		}
 

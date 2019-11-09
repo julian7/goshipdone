@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	// register archive modules
+	"github.com/julian7/magelib/ctx"
 	_ "github.com/julian7/magelib/internal/modules/archive"
 	// register build modules
 	_ "github.com/julian7/magelib/internal/modules/build"
@@ -69,10 +70,10 @@ func (pipeline *BuildPipeline) Run() error {
 		pipeline.ReleaseNotes,
 		pipeline.Publishes,
 	}
-	results := &modules.Results{}
+	ctx := &ctx.Context{}
 
 	for _, step := range steps {
-		if err := step.Run(results); err != nil {
+		if err := step.Run(ctx); err != nil {
 			return err
 		}
 	}

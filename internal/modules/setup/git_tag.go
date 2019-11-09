@@ -3,12 +3,13 @@ package setup
 import (
 	"fmt"
 
+	"github.com/julian7/magelib/ctx"
 	"github.com/julian7/magelib/modules"
 	"github.com/magefile/mage/sh"
 )
 
 // GitTag is a module, which takes a git repo, and filling in
-// `Version` information into `modules.Results`
+// `Version` information into `ctx.Context`
 type GitTag struct{}
 
 // nolint: gochecknoinits
@@ -24,14 +25,14 @@ func NewGitTag() modules.Pluggable {
 	return &GitTag{}
 }
 
-// Run records git tag information into modules.Results
-func (setup *GitTag) Run(results *modules.Results) error {
+// Run records git tag information into ctx.Context
+func (setup *GitTag) Run(context *ctx.Context) error {
 	versionTag, err := sh.Output("git", "describe", "--tags", "--always", "--dirty")
 	if err != nil {
 		return fmt.Errorf("cannot detect version tag from git: %w", err)
 	}
 
-	results.Version = versionTag
+	context.Version = versionTag
 
 	return nil
 }

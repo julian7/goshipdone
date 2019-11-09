@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/julian7/magelib/ctx"
 	"github.com/julian7/magelib/modules"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -56,11 +57,11 @@ type (
 
 	goRuntime struct {
 		*Go
-		*modules.Results
+		*ctx.Context
 	}
 
 	goSingleTarget struct {
-		*modules.Results
+		*ctx.Context
 		Arch    string
 		Env     map[string]string
 		LDFlags string
@@ -93,8 +94,8 @@ func NewGo() modules.Pluggable {
 }
 
 // Run executes a go build step
-func (build *Go) Run(results *modules.Results) error {
-	rt := &goRuntime{Go: build, Results: results}
+func (build *Go) Run(context *ctx.Context) error {
+	rt := &goRuntime{Go: build, Context: context}
 
 	targets, err := rt.targets()
 
@@ -140,9 +141,9 @@ func (rt *goRuntime) targets() ([]*goSingleTarget, error) {
 func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, error) {
 	td := &modules.TemplateData{
 		Arch:        goarch,
-		ProjectName: rt.Results.ProjectName,
+		ProjectName: rt.Context.ProjectName,
 		OS:          goos,
-		Version:     rt.Results.Version,
+		Version:     rt.Context.Version,
 	}
 
 	if goos == "windows" {
@@ -155,7 +156,7 @@ func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, er
 		Main:    rt.Go.Main,
 		Name:    rt.Go.Name,
 		OS:      goos,
-		Results: rt.Results,
+		Context: rt.Context,
 	}
 
 	for key, val := range rt.Go.Env {
@@ -174,7 +175,7 @@ func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, er
 	}{
 		{"ldflags", rt.Go.LDFlags, &tar.LDFlags},
 		{"output", path.Join(
-			tar.Results.TargetDir,
+			tar.Context.TargetDir,
 			"{{.ProjectName}}-{{.OS}}-{{.Arch}}",
 			rt.Go.Output,
 		), &tar.Output},
@@ -200,7 +201,7 @@ func (tar *goSingleTarget) build() error {
 		return err
 	}
 
-	tar.AddArtifact(modules.FormatRaw, tar.Name, tar.Output, tar.OS, tar.Arch)
+	tar.Artifacts.Add(ctx.FormatRaw, tar.Name, tar.Output, tar.OS, tar.Arch)
 
 	return nil
 }

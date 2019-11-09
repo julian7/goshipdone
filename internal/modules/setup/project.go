@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/julian7/magelib/ctx"
 	"github.com/julian7/magelib/modules"
 )
 
@@ -36,10 +37,10 @@ func NewProject() modules.Pluggable {
 	}
 }
 
-// Run records project's basic information into modules.Results
-func (proj *Project) Run(results *modules.Results) error {
-	results.ProjectName = proj.Name
-	results.TargetDir = proj.TargetDir
+// Run records project's basic information into ctx.Context
+func (proj *Project) Run(context *ctx.Context) error {
+	context.ProjectName = proj.Name
+	context.TargetDir = proj.TargetDir
 
 	return nil
 }
