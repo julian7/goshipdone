@@ -25,4 +25,14 @@ archives:
     builds:
       - builder
     compression: gzip
+    name: targz
   - type: show
+release_notes:
+  - type: checksum
+    builds:
+      - builder
+    output: "{{.ProjectName}}-{{.Version}}-files-checksums.txt"
+  - type: checksum
+    builds:
+      - targz
+    output: "{{.ProjectName}}-{{.Version}}-checksums.txt"

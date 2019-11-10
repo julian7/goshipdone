@@ -10,6 +10,8 @@ import (
 // dependencies (for example, ArchiveName is often depends on ProjectName, therefore
 // modules have to render them in ProjectName then ArchiveName order)
 type TemplateData struct {
+	// Algo represents algorithm. Hashing and signing modules use them.
+	Algo string
 	// Arch defines target architecture
 	Arch string
 	// ArchiveName defines a URL where the resource will be remotely available

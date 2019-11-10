@@ -9,6 +9,8 @@ import (
 
 	// register build modules
 	_ "github.com/julian7/magelib/internal/modules/build"
+	// register release_note modules
+	_ "github.com/julian7/magelib/internal/modules/release_note"
 	// register setup modules
 	_ "github.com/julian7/magelib/internal/modules/setup"
 	"github.com/julian7/magelib/modules"
@@ -21,7 +23,7 @@ type BuildPipeline struct {
 	Setups       *modules.Modules `yaml:",omitempty"`
 	Builds       *modules.Modules `yaml:",omitempty"`
 	Archives     *modules.Modules `yaml:",omitempty"`
-	ReleaseNotes *modules.Modules `yaml:",omitempty"`
+	ReleaseNotes *modules.Modules `yaml:"release_notes,omitempty"`
 	Publishes    *modules.Modules `yaml:",omitempty"`
 }
 
