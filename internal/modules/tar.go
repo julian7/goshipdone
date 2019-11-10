@@ -152,10 +152,7 @@ func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts)
 	} {
 		var err error
 
-		*task.target, err = td.Parse(
-			fmt.Sprintf("archivetar-%s-%s-%s-%s", archive.ID, ret.OS, ret.Arch, task.name),
-			task.source,
-		)
+		*task.target, err = td.Parse("archive:tar", task.source)
 		if err != nil {
 			return nil, fmt.Errorf("rendering %q: %w", task.source, err)
 		}

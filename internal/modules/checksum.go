@@ -119,10 +119,7 @@ func (checksum *Checksum) parseOutput(context *ctx.Context) (string, error) {
 		Version:     context.Version,
 	}
 
-	output, err := td.Parse(
-		fmt.Sprintf("checksum-%s", checksum.ID),
-		checksum.Output,
-	)
+	output, err := td.Parse("checksum", checksum.Output)
 	if err != nil {
 		return "", fmt.Errorf("rendering %q: %w", checksum.Output, err)
 	}

@@ -173,10 +173,7 @@ func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (module
 	}
 
 	for _, item := range tasks {
-		(*item.target), err = td.Parse(
-			fmt.Sprintf("buildgo-%s-%s-%s-%s", build.ID, goos, goarch, item.name),
-			item.source,
-		)
+		(*item.target), err = td.Parse("build:go", item.source)
 		if err != nil {
 			return nil, fmt.Errorf("cannot render %s: %w", item.name, err)
 		}
