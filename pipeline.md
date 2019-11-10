@@ -29,7 +29,7 @@ release_notes:
 publish:
 
 - [ ] S3
-- [ ] SSH / SCP
+- [x] SCP
 - [ ] HTTP PUT
 - [ ] GitHub Releases API
 - [ ] GitLab Releases API
