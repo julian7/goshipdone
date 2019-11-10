@@ -1,7 +1,7 @@
 package modules
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/julian7/magelib/ctx"
 	"github.com/julian7/magelib/modules"
@@ -26,7 +26,7 @@ func NewShow() modules.Pluggable {
 // Run provides a list of artifacts recorded so far
 func (Show) Run(context *ctx.Context) error {
 	for _, art := range context.Artifacts {
-		fmt.Printf("- %+v\n", art)
+		log.Printf("- %s: %s (%s)", art.ID, art.Filename, art.OsArch())
 	}
 
 	return nil

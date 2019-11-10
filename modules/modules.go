@@ -5,6 +5,7 @@ package modules
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -131,11 +132,11 @@ func (mod *Modules) String() string {
 // Run goes through all internally loaded modules, and run them
 // one by one.
 func (mod *Modules) Run(context *ctx.Context) error {
-	fmt.Printf("====> %s\n", strings.ToUpper(mod.Stage))
+	log.Printf("====> %s", strings.ToUpper(mod.Stage))
 	startMod := time.Now()
 
 	for _, module := range mod.Modules {
-		fmt.Printf("----> %s\n", module.Type)
+		log.Printf("----> %s", module.Type)
 		start := time.Now()
 
 		missing := MissingDepsForModule(fmt.Sprintf("%s:%s", mod.Stage, module.Type))
@@ -148,9 +149,9 @@ func (mod *Modules) Run(context *ctx.Context) error {
 			return fmt.Errorf("%s:%s: %w", mod.Stage, module.Type, err)
 		}
 
-		fmt.Printf("<---- %s done in %s\n", module.Type, time.Since(start))
+		log.Printf("<---- %s done in %s", module.Type, time.Since(start))
 	}
-	fmt.Printf("<==== %s done in %s\n", strings.ToUpper(mod.Stage), time.Since(startMod))
+	log.Printf("<==== %s done in %s", strings.ToUpper(mod.Stage), time.Since(startMod))
 	return nil
 }
 

@@ -2,8 +2,8 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/julian7/magelib/pipeline"
 )
@@ -19,9 +19,9 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Result: %v\n", pipe)
+	log.Printf("Result: %v", pipe)
 
 	if err := pipe.Run(); err != nil {
-		fmt.Printf("Error: %v\n", err)
+		log.Printf("Error: %v", err)
 	}
 }
