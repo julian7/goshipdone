@@ -114,6 +114,7 @@ func (mod *Modules) Run(context *ctx.Context) error {
 
 	for _, module := range mod.Modules {
 		fmt.Printf("----> %s\n", module.Type)
+		start := time.Now()
 
 		missing, err := MissingDepsForModule(fmt.Sprintf("%s:%s", mod.Stage, module.Type))
 		if err != nil {
@@ -128,7 +129,7 @@ func (mod *Modules) Run(context *ctx.Context) error {
 			return fmt.Errorf("%s:%s: %w", mod.Stage, module.Type, err)
 		}
 
-		fmt.Printf("----< %s done\n", module.Type)
+		fmt.Printf("----< %s done in %s\n", module.Type, time.Since(start))
 	}
 
 	return nil
