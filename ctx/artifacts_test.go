@@ -14,15 +14,15 @@ func TestArtifacts_Add(t *testing.T) {
 		{
 			name:       "first",
 			artifacts:  nil,
-			arg:        &Artifact{Format: 1, Name: "default", Location: "dist", Filename: "dist/default", OS: "linux", Arch: "amd64"},
+			arg:        &Artifact{Format: 1, Name: "default", Location: "dist/default", Filename: "default", OS: "linux", Arch: "amd64"},
 			wantsCount: 1,
 		},
 		{
 			name: "second",
 			artifacts: Artifacts{
-				&Artifact{Filename: "dist/default", Format: 1, Location: "dist", Name: "default", OS: "windows", Arch: "amd64"},
+				&Artifact{Filename: "default", Format: 1, Location: "dist/default", Name: "default", OS: "windows", Arch: "amd64"},
 			},
-			arg:        &Artifact{Format: 1, Name: "default", Location: "dist", Filename: "dist/default", OS: "linux", Arch: "amd64"},
+			arg:        &Artifact{Format: 1, Name: "default", Location: "dist/default", Filename: "default", OS: "linux", Arch: "amd64"},
 			wantsCount: 2,
 		},
 	}
@@ -52,12 +52,12 @@ func TestArtifacts_ByName(t *testing.T) {
 	}{
 		{"empty", nil, "nonexisting", 0},
 		{"notfound", Artifacts{
-			&Artifact{Filename: "a/b", Format: 1, Name: "a", OS: "linux", Arch: "386"},
+			&Artifact{Location: "dist/a/b", Filename: "a/b", Format: 1, Name: "a", OS: "linux", Arch: "386"},
 		}, "b", 0},
 		{"found", Artifacts{
-			&Artifact{Filename: "a/b", Format: 1, Name: "a", OS: "linux", Arch: "386"},
-			&Artifact{Filename: "a/b.exe", Format: 1, Name: "a", OS: "windows", Arch: "386"},
-			&Artifact{Filename: "a/c", Format: 1, Name: "c", OS: "linux", Arch: "386"},
+			&Artifact{Location: "dist/a/b", Filename: "a/b", Format: 1, Name: "a", OS: "linux", Arch: "386"},
+			&Artifact{Location: "dist/a/b.exe", Filename: "a/b.exe", Format: 1, Name: "a", OS: "windows", Arch: "386"},
+			&Artifact{Location: "dist/a/c", Filename: "a/c", Format: 1, Name: "c", OS: "linux", Arch: "386"},
 		}, "a", 2},
 	}
 	for _, tt := range tests {

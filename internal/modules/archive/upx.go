@@ -47,7 +47,7 @@ func (archive *UPX) Run(context *ctx.Context) error {
 
 	for osarch := range artifactMap {
 		for _, artifact := range *artifactMap[osarch] {
-			args = append(args, artifact.Filename)
+			args = append(args, artifact.Location)
 		}
 	}
 

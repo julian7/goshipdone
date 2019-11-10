@@ -148,7 +148,7 @@ func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts)
 		target *string
 	}{
 		{"commondir", archive.CommonDir, &ret.CommonDir},
-		{"output", path.Join(context.TargetDir, archive.Output), &ret.Output},
+		{"output", archive.Output, &ret.Output},
 	} {
 		var err error
 
@@ -166,9 +166,11 @@ func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts)
 }
 
 func (target *singleTarget) Run(context *ctx.Context) error {
-	archive, err := os.Create(target.Output)
+	archiveFile := path.Join(context.TargetDir, target.Output)
+
+	archive, err := os.Create(archiveFile)
 	if err != nil {
-		return fmt.Errorf("cannot create archive file %s: %w", target.Output, err)
+		return fmt.Errorf("cannot create archive file %s: %w", archiveFile, err)
 	}
 
 	defer archive.Close()
@@ -181,13 +183,13 @@ func (target *singleTarget) Run(context *ctx.Context) error {
 
 	for _, artifact := range *target.Targets {
 		if err := target.writeArtifact(tw, artifact); err != nil {
-			return fmt.Errorf("writing %s: %w", target.Output, err)
+			return fmt.Errorf("writing %s: %w", archiveFile, err)
 		}
 	}
 
 	for _, file := range target.Files {
 		if err := target.writeFileGlob(tw, file); err != nil {
-			return fmt.Errorf("writing %s: %w", target.Output, err)
+			return fmt.Errorf("writing %s: %w", archiveFile, err)
 		}
 	}
 
@@ -195,7 +197,7 @@ func (target *singleTarget) Run(context *ctx.Context) error {
 		Arch:     target.Arch,
 		Filename: target.Output,
 		Format:   ctx.FormatTar,
-		Location: target.Output,
+		Location: archiveFile,
 		Name:     target.Name,
 		OS:       target.OS,
 	})
@@ -204,15 +206,12 @@ func (target *singleTarget) Run(context *ctx.Context) error {
 }
 
 func (target *singleTarget) writeArtifact(tw *tar.Writer, artifact *ctx.Artifact) error {
-	filename := path.Join(
-		target.CommonDir,
-		strings.TrimPrefix(artifact.Filename, artifact.Location+"/"),
-	)
+	filename := path.Join(target.CommonDir, artifact.Filename)
 	if err := target.writeDirs(tw, path.Dir(filename)); err != nil {
 		return err
 	}
 
-	return target.writeFile(tw, filename, artifact.Filename)
+	return target.writeFile(tw, filename, artifact.Location)
 }
 
 func (target *singleTarget) writeFileGlob(tw *tar.Writer, source string) error {
