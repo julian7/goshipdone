@@ -234,7 +234,15 @@ func (target *singleTarget) run() error {
 		}
 	}
 
-	target.Context.Artifacts.Add(ctx.FormatTar, target.Name, target.Output, target.Output, target.OS, target.Arch)
+	context.Artifacts.Add(&ctx.Artifact{
+		Arch:     target.Arch,
+		Filename: target.Output,
+		Format:   ctx.FormatTar,
+		Location: target.Output,
+		Name:     target.Name,
+		OS:       target.OS,
+	})
+
 	return nil
 }
 

@@ -34,15 +34,8 @@ type (
 )
 
 // Add registers a new artifact in Artifacts
-func (arts *Artifacts) Add(format int, name, location, filename, os, arch string) {
-	*arts = append(*arts, &Artifact{
-		Arch:     arch,
-		Filename: filename,
-		Format:   format,
-		Location: location,
-		Name:     name,
-		OS:       os,
-	})
+func (arts *Artifacts) Add(artifact *Artifact) {
+	*arts = append(*arts, artifact)
 }
 
 // ByName searches artifacts by their build names

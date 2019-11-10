@@ -5,24 +5,16 @@ import (
 )
 
 func TestArtifacts_Add(t *testing.T) {
-	type args struct {
-		format   int
-		name     string
-		location string
-		filename string
-		os       string
-		arch     string
-	}
 	tests := []struct {
 		name       string
 		artifacts  Artifacts
-		args       args
+		arg        *Artifact
 		wantsCount int
 	}{
 		{
 			name:       "first",
 			artifacts:  nil,
-			args:       args{format: 1, name: "default", location: "dist", filename: "dist/default", os: "linux", arch: "amd64"},
+			arg:        &Artifact{Format: 1, Name: "default", Location: "dist", Filename: "dist/default", OS: "linux", Arch: "amd64"},
 			wantsCount: 1,
 		},
 		{
@@ -30,13 +22,13 @@ func TestArtifacts_Add(t *testing.T) {
 			artifacts: Artifacts{
 				&Artifact{Filename: "dist/default", Format: 1, Location: "dist", Name: "default", OS: "windows", Arch: "amd64"},
 			},
-			args:       args{format: 1, name: "default", location: "dist", filename: "dist/default", os: "linux", arch: "amd64"},
+			arg:        &Artifact{Format: 1, Name: "default", Location: "dist", Filename: "dist/default", OS: "linux", Arch: "amd64"},
 			wantsCount: 2,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.artifacts.Add(tt.args.format, tt.args.name, tt.args.location, tt.args.filename, tt.args.os, tt.args.arch)
+			tt.artifacts.Add(tt.arg)
 
 			noArtifacts := len(tt.artifacts)
 			if noArtifacts != tt.wantsCount {

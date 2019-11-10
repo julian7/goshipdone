@@ -202,7 +202,14 @@ func (tar *goSingleTarget) build() error {
 		return err
 	}
 
-	tar.Artifacts.Add(ctx.FormatRaw, tar.Name, tar.OutDir, output, tar.OS, tar.Arch)
+	tar.Artifacts.Add(&ctx.Artifact{
+		Arch:     tar.Arch,
+		Filename: output,
+		Format:   ctx.FormatRaw,
+		Location: tar.OutDir,
+		Name:     tar.Name,
+		OS:       tar.OS,
+	})
 
 	return nil
 }
