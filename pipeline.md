@@ -23,7 +23,7 @@ release_notes:
 - [ ] git-chglog
 - [ ] script
 - [ ] go run
-- [ ] SHA checksum
+- [x] checksum
 - [ ] GPG sign
 
 publish:
