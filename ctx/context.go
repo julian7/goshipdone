@@ -1,3 +1,5 @@
+// ctx provides a cumulative structure carried over to each module
+// in the build pipeline.
 package ctx
 
 // Context are a cumulative structure carried over to each module,

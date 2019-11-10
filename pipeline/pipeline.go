@@ -1,3 +1,5 @@
+// pipeline provides a configurable build pipeline, taking
+// its inputs from a YAML source.
 package pipeline
 
 import (

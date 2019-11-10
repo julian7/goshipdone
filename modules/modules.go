@@ -1,3 +1,5 @@
+// modules provides an extendable interface for executable components in the
+// build pipeline.
 package modules
 
 import (
