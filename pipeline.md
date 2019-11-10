@@ -15,7 +15,7 @@ archive:
 
 - [x] upx
 - [ ] gzip
-- [ ] tar
+- [x] tar
 - [ ] zip
 
 release_notes:
