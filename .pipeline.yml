@@ -19,7 +19,8 @@ builds:
 archives:
   - type: show
   - type: upx
-    build: builder
+    builds:
+      - builder
   - type: tar
     builds:
       - builder

@@ -11,9 +11,11 @@ import (
 // UPX is a module for compressing executable binaries in a self-extracting
 // format using `upx` tool.
 type UPX struct {
-	// Build specifies a single build name to find related artifacts to
+	// Builds specifies a build names to find related artifacts to
 	// modify.
-	Build string
+	Builds []string
+	// Skip specifies which os-arch items should be skipped
+	Skip []string
 }
 
 //nolint: gochecknoinits
@@ -25,7 +27,7 @@ func init() {
 }
 
 func NewUPX() modules.Pluggable {
-	return &UPX{Build: "default"}
+	return &UPX{Builds: []string{"default"}}
 }
 
 // Run calls upx on built artifacts, changing their artifact types
@@ -36,23 +38,27 @@ func (archive *UPX) Run(context *ctx.Context) error {
 		return err
 	}
 
-	artifacts := context.Artifacts.ByName(archive.Build)
-	if len(*artifacts) == 0 {
+	artifactMap := context.Artifacts.OsArchByNames(archive.Builds, archive.Skip)
+	if len(artifactMap) == 0 {
 		return nil
 	}
 
-	args := make([]string, len(*artifacts))
+	args := []string{}
 
-	for i, artifact := range *artifacts {
-		args[i] = artifact.Filename
+	for osarch := range artifactMap {
+		for _, artifact := range *artifactMap[osarch] {
+			args = append(args, artifact.Filename)
+		}
 	}
 
 	if err := sh.RunV(upxCmd, args...); err != nil {
 		return err
 	}
 
-	for _, artifact := range *artifacts {
-		artifact.Format = ctx.FormatUPX
+	for osarch := range artifactMap {
+		for _, artifact := range *artifactMap[osarch] {
+			artifact.Format = ctx.FormatUPX
+		}
 	}
 
 	return nil
