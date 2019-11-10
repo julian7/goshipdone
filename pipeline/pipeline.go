@@ -5,14 +5,9 @@ import (
 
 	// register archive modules
 	"github.com/julian7/magelib/ctx"
-	_ "github.com/julian7/magelib/internal/modules/archive"
+	// register internal modules
+	_ "github.com/julian7/magelib/internal/modules"
 
-	// register build modules
-	_ "github.com/julian7/magelib/internal/modules/build"
-	// register release_note modules
-	_ "github.com/julian7/magelib/internal/modules/release_note"
-	// register setup modules
-	_ "github.com/julian7/magelib/internal/modules/setup"
 	"github.com/julian7/magelib/modules"
 	"gopkg.in/yaml.v3"
 )

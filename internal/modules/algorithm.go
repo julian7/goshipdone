@@ -1,4 +1,4 @@
-package release_note
+package modules
 
 import (
 	"crypto/md5"
