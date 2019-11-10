@@ -65,45 +65,28 @@ func NewTar() modules.Pluggable {
 	}
 }
 
-type tarRuntime struct {
-	*Tar
-	*ctx.Context
-	targets map[string]*ctx.Artifacts
-}
-
 func (archive *Tar) Run(context *ctx.Context) error {
-	runtime, err := archive.newRuntime(context)
+	builds := context.Artifacts.OsArchByNames(archive.Builds, archive.Skip)
 
-	if err != nil {
+	if err := validateBuilds(builds); err != nil {
 		return err
 	}
 
-	return runtime.run()
-}
+	for osarch := range builds {
+		target, err := archive.singleTarget(context, builds[osarch])
+		if err != nil {
+			return err
+		}
 
-func (archive *Tar) newRuntime(context *ctx.Context) (*tarRuntime, error) {
-	skipIndex := make(map[string]bool, len(archive.Skip))
-
-	for _, skip := range archive.Skip {
-		skipIndex[skip] = true
-	}
-
-	builds := map[string]*ctx.Artifacts{}
-
-	for _, build := range archive.Builds {
-		for _, art := range *context.Artifacts.ByName(build) {
-			osarch := fmt.Sprintf("%s-%s", art.OS, art.Arch)
-			if _, ok := skipIndex[osarch]; ok {
-				continue
-			}
-
-			if _, ok := builds[osarch]; !ok {
-				builds[osarch] = &ctx.Artifacts{}
-			}
-			*builds[osarch] = append(*builds[osarch], art)
+		if err := target.Run(context); err != nil {
+			return err
 		}
 	}
 
+	return nil
+}
+
+func validateBuilds(builds map[string]*ctx.Artifacts) error {
 	numTargets := 0
 	lastosarch := ""
 
@@ -115,29 +98,10 @@ func (archive *Tar) newRuntime(context *ctx.Context) (*tarRuntime, error) {
 			continue
 		}
 		if numTargets < targets {
-			return nil, errNumTargets(lastosarch, osarch, builds)
+			return errNumTargets(lastosarch, osarch, builds)
 		}
 		if numTargets > targets {
-			return nil, errNumTargets(osarch, lastosarch, builds)
-		}
-	}
-
-	return &tarRuntime{
-		Tar:     archive,
-		Context: context,
-		targets: builds,
-	}, nil
-}
-
-func (rt *tarRuntime) run() error {
-	for osarch := range rt.targets {
-		target, err := rt.singleTarget(osarch)
-		if err != nil {
-			return err
-		}
-
-		if err := target.run(); err != nil {
-			return err
+			return errNumTargets(osarch, lastosarch, builds)
 		}
 	}
 
@@ -145,7 +109,6 @@ func (rt *tarRuntime) run() error {
 }
 
 type singleTarget struct {
-	*ctx.Context
 	Arch        string
 	CommonDir   string
 	Compression Compression
@@ -157,32 +120,26 @@ type singleTarget struct {
 	Targets     *ctx.Artifacts
 }
 
-func (rt *tarRuntime) singleTarget(osarch string) (*singleTarget, error) {
-	artifacts, ok := rt.targets[osarch]
-	if !ok || len(*artifacts) == 0 {
-		return nil, fmt.Errorf("empty target for os-arch %s", osarch)
-	}
-
+func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts) (*singleTarget, error) {
 	ret := &singleTarget{
-		Context:     rt.Context,
 		Arch:        (*artifacts)[0].Arch,
-		Compression: rt.Tar.Compression,
+		Compression: archive.Compression,
 		DirsWritten: map[string]bool{},
-		Files:       make([]string, len(rt.Files)),
-		Name:        rt.Tar.Name,
+		Files:       make([]string, len(archive.Files)),
+		Name:        archive.Name,
 		OS:          (*artifacts)[0].OS,
 		Targets:     artifacts,
 	}
-	for i := range rt.Files {
-		ret.Files[i] = rt.Files[i]
+	for i := range archive.Files {
+		ret.Files[i] = archive.Files[i]
 	}
 
 	td := &modules.TemplateData{
 		Arch:        ret.Arch,
-		ProjectName: rt.Context.ProjectName,
+		ProjectName: context.ProjectName,
 		OS:          ret.OS,
-		Version:     rt.Context.Version,
-		Ext:         rt.Compression.Extension(),
+		Version:     context.Version,
+		Ext:         archive.Compression.Extension(),
 	}
 
 	for _, task := range []struct {
@@ -190,13 +147,13 @@ func (rt *tarRuntime) singleTarget(osarch string) (*singleTarget, error) {
 		source string
 		target *string
 	}{
-		{"commondir", rt.Tar.CommonDir, &ret.CommonDir},
-		{"output", path.Join(rt.Context.TargetDir, rt.Tar.Output), &ret.Output},
+		{"commondir", archive.CommonDir, &ret.CommonDir},
+		{"output", path.Join(context.TargetDir, archive.Output), &ret.Output},
 	} {
 		var err error
 
 		*task.target, err = td.Parse(
-			fmt.Sprintf("archivetar-%s-%s-%s-%s", rt.Tar.Name, ret.OS, ret.Arch, task.name),
+			fmt.Sprintf("archivetar-%s-%s-%s-%s", archive.Name, ret.OS, ret.Arch, task.name),
 			task.source,
 		)
 		if err != nil {
@@ -208,7 +165,7 @@ func (rt *tarRuntime) singleTarget(osarch string) (*singleTarget, error) {
 	return ret, nil
 }
 
-func (target *singleTarget) run() error {
+func (target *singleTarget) Run(context *ctx.Context) error {
 	archive, err := os.Create(target.Output)
 	if err != nil {
 		return fmt.Errorf("cannot create archive file %s: %w", target.Output, err)
@@ -347,7 +304,7 @@ func (target *singleTarget) writeDir(tw *tar.Writer, dirname string, mode int64)
 		return nil
 	}
 
-	st, err := os.Stat(target.TargetDir)
+	st, err := os.Stat(path.Dir(target.Output))
 	if err != nil {
 		return err
 	}

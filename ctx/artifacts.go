@@ -49,6 +49,33 @@ func (arts *Artifacts) ByName(name string) *Artifacts {
 	return results
 }
 
+//OsArchByNames maps artifacts by OS-Arch, filtering by names
+func (arts *Artifacts) OsArchByNames(names []string, skips []string) map[string]*Artifacts {
+	skipIndex := make(map[string]bool, len(skips))
+
+	for _, skip := range skips {
+		skipIndex[skip] = true
+	}
+
+	builds := map[string]*Artifacts{}
+
+	for _, name := range names {
+		for _, art := range *arts.ByName(name) {
+			osarch := art.OsArch()
+			if _, ok := skipIndex[osarch]; ok {
+				continue
+			}
+
+			if _, ok := builds[osarch]; !ok {
+				builds[osarch] = &Artifacts{}
+			}
+			*builds[osarch] = append(*builds[osarch], art)
+		}
+	}
+
+	return builds
+}
+
 // OsArch returns artifact's os-arch string
 func (art *Artifact) OsArch() string {
 	return fmt.Sprintf("%s-%s", art.OS, art.Arch)

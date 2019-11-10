@@ -55,11 +55,6 @@ type (
 		Skip []string
 	}
 
-	goRuntime struct {
-		*Go
-		*ctx.Context
-	}
-
 	goSingleTarget struct {
 		*ctx.Context
 		Arch    string
@@ -96,16 +91,14 @@ func NewGo() modules.Pluggable {
 
 // Run executes a go build step
 func (build *Go) Run(context *ctx.Context) error {
-	rt := &goRuntime{Go: build, Context: context}
-
-	targets, err := rt.targets()
+	targets, err := build.targets(context)
 
 	if err != nil {
 		return err
 	}
 
 	for _, tar := range targets {
-		if err := tar.build(); err != nil {
+		if err := tar.Run(context); err != nil {
 			return err
 		}
 	}
@@ -113,20 +106,20 @@ func (build *Go) Run(context *ctx.Context) error {
 	return nil
 }
 
-func (rt *goRuntime) targets() ([]*goSingleTarget, error) {
-	targets := []*goSingleTarget{}
+func (build *Go) targets(context *ctx.Context) ([]modules.Pluggable, error) {
+	targets := []modules.Pluggable{}
 
-	for _, goos := range rt.Go.GOOS {
+	for _, goos := range build.GOOS {
 	NextArch:
-		for _, goarch := range rt.Go.GOArch {
+		for _, goarch := range build.GOArch {
 			osarch := fmt.Sprintf("%s-%s", goos, goarch)
-			for _, skip := range rt.Go.Skip {
+			for _, skip := range build.Skip {
 				if osarch == skip {
 					continue NextArch
 				}
 			}
 
-			target, err := rt.buildSingleTarget(goos, goarch)
+			target, err := build.singleTarget(context, goos, goarch)
 
 			if err != nil {
 				return nil, err
@@ -139,12 +132,12 @@ func (rt *goRuntime) targets() ([]*goSingleTarget, error) {
 	return targets, nil
 }
 
-func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, error) {
+func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.Pluggable, error) {
 	td := &modules.TemplateData{
 		Arch:        goarch,
-		ProjectName: rt.Context.ProjectName,
+		ProjectName: context.ProjectName,
 		OS:          goos,
-		Version:     rt.Context.Version,
+		Version:     context.Version,
 	}
 
 	if goos == "windows" {
@@ -152,15 +145,14 @@ func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, er
 	}
 
 	tar := &goSingleTarget{
-		Arch:    goarch,
-		Env:     map[string]string{},
-		Main:    rt.Go.Main,
-		Name:    rt.Go.Name,
-		OS:      goos,
-		Context: rt.Context,
+		Arch: goarch,
+		Env:  map[string]string{},
+		Main: build.Main,
+		Name: build.Name,
+		OS:   goos,
 	}
 
-	for key, val := range rt.Go.Env {
+	for key, val := range build.Env {
 		tar.Env[key] = val
 	}
 
@@ -174,16 +166,16 @@ func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, er
 		source string
 		target *string
 	}{
-		{"ldflags", rt.Go.LDFlags, &tar.LDFlags},
+		{"ldflags", build.LDFlags, &tar.LDFlags},
 		{"location", path.Join(
 			tar.Context.TargetDir,
 			"{{.ProjectName}}-{{.OS}}-{{.Arch}}"), &tar.OutDir},
-		{"output", rt.Go.Output, &tar.Output},
+		{"output", build.Output, &tar.Output},
 	}
 
 	for _, item := range tasks {
 		(*item.target), err = td.Parse(
-			fmt.Sprintf("buildgo-%s-%s-%s-%s", rt.Go.Name, goos, goarch, item.name),
+			fmt.Sprintf("buildgo-%s-%s-%s-%s", build.Name, goos, goarch, item.name),
 			item.source,
 		)
 		if err != nil {
@@ -194,7 +186,7 @@ func (rt *goRuntime) buildSingleTarget(goos, goarch string) (*goSingleTarget, er
 	return tar, nil
 }
 
-func (tar *goSingleTarget) build() error {
+func (tar *goSingleTarget) Run(context *ctx.Context) error {
 	output := path.Join(tar.OutDir, tar.Output)
 	err := sh.RunWith(tar.Env, mg.GoCmd(), "build", "-o", output, "-ldflags", tar.LDFlags, tar.Main)
 	if err != nil {
