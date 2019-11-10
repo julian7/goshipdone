@@ -1,7 +1,5 @@
 package modules
 
-import "fmt"
-
 // nolint: gochecknoglobals
 var modRegistry map[string]PluggableCache
 
@@ -47,14 +45,14 @@ func RegisterModule(definition *PluggableModule) {
 }
 
 // MissingDepsForModule returns module's dependedcies, which weren't
-// loaded. It also returns an error, if the referenced module is not
-// registered in the first place.
+// loaded. It silently returns nil if module is not registered,
+// allowing dynamic modules to be passed through.
 //
 // Module is referenced by its `Kind`, see `PluggableModule`.
-func MissingDepsForModule(kind string) ([]string, error) {
+func MissingDepsForModule(kind string) []string {
 	mod, ok := modRegistry[kind]
 	if !ok {
-		return nil, fmt.Errorf("module not registered: %s", kind)
+		return nil
 	}
 
 	missing := []string{}
@@ -65,7 +63,7 @@ func MissingDepsForModule(kind string) ([]string, error) {
 		}
 	}
 
-	return missing, nil
+	return missing
 }
 
 // LookupModule returns a PluggableFactory based on its Kind

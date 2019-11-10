@@ -116,10 +116,7 @@ func (mod *Modules) Run(context *ctx.Context) error {
 		fmt.Printf("----> %s\n", module.Type)
 		start := time.Now()
 
-		missing, err := MissingDepsForModule(fmt.Sprintf("%s:%s", mod.Stage, module.Type))
-		if err != nil {
-			return err
-		}
+		missing := MissingDepsForModule(fmt.Sprintf("%s:%s", mod.Stage, module.Type))
 
 		if len(missing) > 0 {
 			return fmt.Errorf("missing dependencies: %s", strings.Join(missing, ", "))
