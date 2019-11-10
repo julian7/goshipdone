@@ -56,7 +56,6 @@ type (
 	}
 
 	goSingleTarget struct {
-		*ctx.Context
 		Arch    string
 		Env     map[string]string
 		LDFlags string
@@ -168,7 +167,7 @@ func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (module
 	}{
 		{"ldflags", build.LDFlags, &tar.LDFlags},
 		{"location", path.Join(
-			tar.Context.TargetDir,
+			context.TargetDir,
 			"{{.ProjectName}}-{{.OS}}-{{.Arch}}"), &tar.OutDir},
 		{"output", build.Output, &tar.Output},
 	}
@@ -194,7 +193,7 @@ func (tar *goSingleTarget) Run(context *ctx.Context) error {
 		return err
 	}
 
-	tar.Artifacts.Add(&ctx.Artifact{
+	context.Artifacts.Add(&ctx.Artifact{
 		Arch:     tar.Arch,
 		Filename: output,
 		Format:   ctx.FormatRaw,
