@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/julian7/magelib/ctx"
 	"gopkg.in/yaml.v3"
@@ -55,7 +56,7 @@ func (mod *Modules) UnmarshalYAML(node *yaml.Node) error {
 			)
 		}
 
-		if err := mod.AddModule(itemType, child, false); err != nil {
+		if err := mod.Add(itemType, child, false); err != nil {
 			return err
 		}
 	}
@@ -63,9 +64,9 @@ func (mod *Modules) UnmarshalYAML(node *yaml.Node) error {
 	return nil
 }
 
-// AddModule adds a single module into Modules, decoding a YAML node if provided.
+// Add adds a single module into Modules, decoding a YAML node if provided.
 // It is also able to register a node only if not yet registered.
-func (mod *Modules) AddModule(itemType string, node *yaml.Node, once bool) error {
+func (mod *Modules) Add(itemType string, node *yaml.Node, once bool) error {
 	kind := fmt.Sprintf("%s:%s", mod.Stage, itemType)
 
 	if once && isLoaded(kind) {

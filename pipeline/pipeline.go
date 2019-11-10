@@ -42,7 +42,7 @@ func LoadBuildPipeline(ymlcontent []byte) (*BuildPipeline, error) {
 	}
 
 	for _, itemType := range []string{"project", "git_tag"} {
-		_ = pipeline.Setups.AddModule(itemType, nil, true)
+		_ = pipeline.Setups.Add(itemType, nil, true)
 	}
 
 	return pipeline, nil
