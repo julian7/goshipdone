@@ -18,8 +18,9 @@ type (
 	// module registration
 	PluggableModule struct {
 		// Kind is a string representation of stage/type how
-		// the module can be referred to. Format: "stage:type", like
-		// "build:script".
+		// the module can be referred to. Format: "`stage`:`type`", like
+		// "build:script". To register a module for every stage, use
+		// "*:`type`" format.
 		Kind string
 		// Factory is the factory method to create a new module
 		// with defaults.

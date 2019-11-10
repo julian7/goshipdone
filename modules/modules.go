@@ -66,16 +66,35 @@ func (mod *Modules) UnmarshalYAML(node *yaml.Node) error {
 
 // Add adds a single module into Modules, decoding a YAML node if provided.
 // It is also able to register a node only if not yet registered.
+// By default, Modules allows registration of its own stage only, but
+// modules registered for all stages are also accepted, if there is no
+// specific module registration exists.
+//
+// Eg. if there are two different modules registered for "*:dump" and
+// "build:dump", a reference to "dump" kind in archives will fire "*:dump"
+// module, but a similar "dump" kind in builds will fire "build:dump".
 func (mod *Modules) Add(itemType string, node *yaml.Node, once bool) error {
-	kind := fmt.Sprintf("%s:%s", mod.Stage, itemType)
+	var kind string
 
-	if once && isLoaded(kind) {
-		return fmt.Errorf("module %s already loaded", kind)
+	var targetModFactory PluggableFactory
+
+	var ok bool
+
+	for _, stage := range []string{mod.Stage, "*"} {
+		kind = fmt.Sprintf("%s:%s", stage, itemType)
+
+		if once && isLoaded(kind) {
+			return fmt.Errorf("module %s already loaded", kind)
+		}
+
+		targetModFactory, ok = LookupModule(kind)
+		if ok {
+			break
+		}
 	}
 
-	targetModFactory, ok := LookupModule(kind)
 	if !ok {
-		return fmt.Errorf("unknown module %s", kind)
+		return fmt.Errorf("unknown module %s:%s", mod.Stage, itemType)
 	}
 
 	targetMod := targetModFactory()

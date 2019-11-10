@@ -13,7 +13,7 @@ type Show struct{}
 // nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "archive:show",
+		Kind:    "*:show",
 		Factory: NewShow,
 	})
 }
