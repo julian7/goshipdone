@@ -6,6 +6,7 @@ import (
 	// register archive modules
 	"github.com/julian7/magelib/ctx"
 	_ "github.com/julian7/magelib/internal/modules/archive"
+
 	// register build modules
 	_ "github.com/julian7/magelib/internal/modules/build"
 	// register setup modules

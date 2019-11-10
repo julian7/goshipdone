@@ -111,6 +111,7 @@ func (mod *Modules) String() string {
 // one by one.
 func (mod *Modules) Run(context *ctx.Context) error {
 	fmt.Printf("====> %s\n", strings.ToUpper(mod.Stage))
+	startMod := time.Now()
 
 	for _, module := range mod.Modules {
 		fmt.Printf("----> %s\n", module.Type)
@@ -126,9 +127,9 @@ func (mod *Modules) Run(context *ctx.Context) error {
 			return fmt.Errorf("%s:%s: %w", mod.Stage, module.Type, err)
 		}
 
-		fmt.Printf("----< %s done in %s\n", module.Type, time.Since(start))
+		fmt.Printf("<---- %s done in %s\n", module.Type, time.Since(start))
 	}
-
+	fmt.Printf("<==== %s done in %s\n", strings.ToUpper(mod.Stage), time.Since(startMod))
 	return nil
 }
 
