@@ -2,13 +2,13 @@
 setup:
   -
     type: project
-    name: magelib
+    id: magelib
     target: target
 builds:
   - type: go
     ldflags: "-s -w -X main.version={{.Version}}"
     main: ./cmd/builder
-    name: builder
+    id: builder
     output: "builder{{.Ext}}"
     goos:
       - darwin
@@ -25,8 +25,7 @@ archives:
     builds:
       - builder
     compression: gzip
-    name: targz
-  - type: show
+    id: targz
 release_notes:
   - type: checksum
     builds:
@@ -36,3 +35,5 @@ release_notes:
     builds:
       - targz
     output: "{{.ProjectName}}-{{.Version}}-checksums.txt"
+publishes:
+  - type: show
