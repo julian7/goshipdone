@@ -1,4 +1,4 @@
-// example CLI for executing a build pipeline
+// Command builder is an example CLI for executing a build pipeline
 package main
 
 import (

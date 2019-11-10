@@ -1,5 +1,7 @@
 # Magelib
 
+[![GoDoc](https://godoc.org/github.com/julian7/magelib?status.svg)](https://godoc.org/github.com/julian7/magelib)
+
 This project aims to provide basic release functionality to any project using [magefile](https://magefile.org/).
 
 PLEASE NOTE this project is still in early stages.
