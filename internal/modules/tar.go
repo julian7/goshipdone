@@ -29,11 +29,11 @@ type (
 		// Files contains a list of static files should be added to the
 		// archive file. They are interpretered as glob.
 		Files []string
-		// Name contains the artifact's name used by later stages of
+		// ID contains the artifact's name used by later stages of
 		// the build pipeline. Archives, ReleaseNotes, and Publishes
 		// may refer to this name for referencing build results.
 		// Default: "archive".
-		Name string
+		ID string
 		// Output is where the build writes its output. Default:
 		// `{{.ProjectName}}-{{.Version}}-{{.OS}}-{{.Arch}}.tar{{.Ext}}`
 		// where `{{.Ext}}` contains the compression's default extension
@@ -59,14 +59,14 @@ func NewTar() modules.Pluggable {
 		CommonDir:   "{{.ProjectName}}-{{.Version}}-{{.OS}}-{{.Arch}}",
 		Compression: Compression{&CompressNONE{}},
 		Files:       []string{"README*"},
-		Name:        "archive",
+		ID:          "archive",
 		Output:      "{{.ProjectName}}-{{.Version}}-{{.OS}}-{{.Arch}}.tar{{.Ext}}",
 		Skip:        []string{},
 	}
 }
 
 func (archive *Tar) Run(context *ctx.Context) error {
-	builds := context.Artifacts.OsArchByNames(archive.Builds, archive.Skip)
+	builds := context.Artifacts.OsArchByIDs(archive.Builds, archive.Skip)
 
 	if err := validateBuilds(builds); err != nil {
 		return err
@@ -108,25 +108,25 @@ func validateBuilds(builds map[string]*ctx.Artifacts) error {
 	return nil
 }
 
-type singleTarget struct {
+type tarSingleTarget struct {
 	Arch        string
 	CommonDir   string
 	Compression Compression
 	DirsWritten map[string]bool
 	Files       []string
-	Name        string
+	ID          string
 	OS          string
 	Output      string
 	Targets     *ctx.Artifacts
 }
 
-func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts) (*singleTarget, error) {
-	ret := &singleTarget{
+func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts) (*tarSingleTarget, error) {
+	ret := &tarSingleTarget{
 		Arch:        (*artifacts)[0].Arch,
 		Compression: archive.Compression,
 		DirsWritten: map[string]bool{},
 		Files:       make([]string, len(archive.Files)),
-		Name:        archive.Name,
+		ID:          archive.ID,
 		OS:          (*artifacts)[0].OS,
 		Targets:     artifacts,
 	}
@@ -153,7 +153,7 @@ func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts)
 		var err error
 
 		*task.target, err = td.Parse(
-			fmt.Sprintf("archivetar-%s-%s-%s-%s", archive.Name, ret.OS, ret.Arch, task.name),
+			fmt.Sprintf("archivetar-%s-%s-%s-%s", archive.ID, ret.OS, ret.Arch, task.name),
 			task.source,
 		)
 		if err != nil {
@@ -165,7 +165,7 @@ func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts)
 	return ret, nil
 }
 
-func (target *singleTarget) Run(context *ctx.Context) error {
+func (target *tarSingleTarget) Run(context *ctx.Context) error {
 	archiveFile := path.Join(context.TargetDir, target.Output)
 
 	archive, err := os.Create(archiveFile)
@@ -198,14 +198,14 @@ func (target *singleTarget) Run(context *ctx.Context) error {
 		Filename: target.Output,
 		Format:   ctx.FormatTar,
 		Location: archiveFile,
-		Name:     target.Name,
+		ID:       target.ID,
 		OS:       target.OS,
 	})
 
 	return nil
 }
 
-func (target *singleTarget) writeArtifact(tw *tar.Writer, artifact *ctx.Artifact) error {
+func (target *tarSingleTarget) writeArtifact(tw *tar.Writer, artifact *ctx.Artifact) error {
 	filename := path.Join(target.CommonDir, artifact.Filename)
 	if err := target.writeDirs(tw, path.Dir(filename)); err != nil {
 		return err
@@ -214,7 +214,7 @@ func (target *singleTarget) writeArtifact(tw *tar.Writer, artifact *ctx.Artifact
 	return target.writeFile(tw, filename, artifact.Location)
 }
 
-func (target *singleTarget) writeFileGlob(tw *tar.Writer, source string) error {
+func (target *tarSingleTarget) writeFileGlob(tw *tar.Writer, source string) error {
 	matches, err := filepath.Glob(source)
 	if err != nil {
 		return err
@@ -234,7 +234,7 @@ func (target *singleTarget) writeFileGlob(tw *tar.Writer, source string) error {
 	return nil
 }
 
-func (target *singleTarget) writeFile(tw *tar.Writer, destpath, source string) error {
+func (target *tarSingleTarget) writeFile(tw *tar.Writer, destpath, source string) error {
 	fi, err := os.Stat(source)
 	if err != nil {
 		return fmt.Errorf("can't stat file %s: %w", source, err)
@@ -274,7 +274,7 @@ func (target *singleTarget) writeFile(tw *tar.Writer, destpath, source string) e
 	return nil
 }
 
-func (target *singleTarget) writeDirs(tw *tar.Writer, fullpath string) error {
+func (target *tarSingleTarget) writeDirs(tw *tar.Writer, fullpath string) error {
 	if fullpath == "." {
 		return nil
 	}
@@ -298,7 +298,7 @@ func (target *singleTarget) writeDirs(tw *tar.Writer, fullpath string) error {
 	return nil
 }
 
-func (target *singleTarget) writeDir(tw *tar.Writer, dirname string, mode int64) error {
+func (target *tarSingleTarget) writeDir(tw *tar.Writer, dirname string, mode int64) error {
 	if _, ok := target.DirsWritten[dirname]; ok {
 		return nil
 	}

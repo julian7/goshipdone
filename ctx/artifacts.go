@@ -27,8 +27,8 @@ type (
 		Arch     string
 		Filename string
 		Format   int
+		ID       string
 		Location string
-		Name     string
 		OS       string
 	}
 )
@@ -38,19 +38,19 @@ func (arts *Artifacts) Add(artifact *Artifact) {
 	*arts = append(*arts, artifact)
 }
 
-// ByName searches artifacts by their build names
-func (arts *Artifacts) ByName(name string) *Artifacts {
+// ByID searches artifacts by their build IDs
+func (arts *Artifacts) ByID(id string) *Artifacts {
 	results := &Artifacts{}
 	for i := range *arts {
-		if (*arts)[i].Name == name {
+		if (*arts)[i].ID == id {
 			*results = append(*results, (*arts)[i])
 		}
 	}
 	return results
 }
 
-//OsArchByNames maps artifacts by OS-Arch, filtering by names
-func (arts *Artifacts) OsArchByNames(names []string, skips []string) map[string]*Artifacts {
+//OsArchByIDs maps artifacts by OS-Arch, filtering by IDs
+func (arts *Artifacts) OsArchByIDs(ids []string, skips []string) map[string]*Artifacts {
 	skipIndex := make(map[string]bool, len(skips))
 
 	for _, skip := range skips {
@@ -59,8 +59,8 @@ func (arts *Artifacts) OsArchByNames(names []string, skips []string) map[string]
 
 	builds := map[string]*Artifacts{}
 
-	for _, name := range names {
-		for _, art := range *arts.ByName(name) {
+	for _, id := range ids {
+		for _, art := range *arts.ByID(id) {
 			osarch := art.OsArch()
 			if _, ok := skipIndex[osarch]; ok {
 				continue

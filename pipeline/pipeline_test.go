@@ -77,8 +77,8 @@ func TestLoadBuildPipeline(t *testing.T) {
 				Setups: &modules.Modules{
 					Stage: "setup",
 					Modules: []modules.Module{
-						{Type: "project", Pluggable: setup.NewProject()},
-						{Type: "git_tag", Pluggable: setup.NewGitTag()},
+						{Type: "project", Pluggable: intmod.NewProject()},
+						{Type: "git_tag", Pluggable: intmod.NewGitTag()},
 					},
 				},
 				Builds: &modules.Modules{Stage: "build"},

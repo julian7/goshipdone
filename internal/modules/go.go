@@ -23,6 +23,11 @@ type (
 		// GOArch is a list of all GOARCH variations required. It is
 		// set to [`amd64`] by default.
 		GOArch []string
+		// ID contains the artifact's name used by later stages of
+		// the build pipeline. Archives, ReleaseNotes, and Publishes
+		// may refer to this name for referencing build results.
+		// Default: "default".
+		ID string
 		// LDFlags is a `modules.TemplateData` template for providing
 		// `-ldflags` configuration option to `go build` command.
 		// It defaults to `-s -w -X main.version={{.Version}}`.
@@ -30,11 +35,6 @@ type (
 		// Main designates the file / directory where `main` package
 		// (as well as `main` function) is defined.
 		Main string
-		// Name contains the artifact's name used by later stages of
-		// the build pipeline. Archives, ReleaseNotes, and Publishes
-		// may refer to this name for referencing build results.
-		// Default: "default".
-		Name string
 		// Output is where the build writes its output. Default:
 		// `{{.ProjectName}}{{.Ext}}`
 		Output string
@@ -58,10 +58,10 @@ type (
 	goSingleTarget struct {
 		Arch    string
 		Env     map[string]string
+		ID      string
 		LDFlags string
 		OutDir  string
 		Main    string
-		Name    string
 		OS      string
 		Output  string
 	}
@@ -83,7 +83,7 @@ func NewGo() modules.Pluggable {
 		GOOS:    []string{"linux", "windows"},
 		GOArch:  []string{"amd64"},
 		Main:    ".",
-		Name:    "default",
+		ID:      "default",
 		Output:  "{{.ProjectName}}{{.Ext}}",
 	}
 }
@@ -146,8 +146,8 @@ func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (module
 	tar := &goSingleTarget{
 		Arch: goarch,
 		Env:  map[string]string{},
+		ID:   build.ID,
 		Main: build.Main,
-		Name: build.Name,
 		OS:   goos,
 	}
 
@@ -174,7 +174,7 @@ func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (module
 
 	for _, item := range tasks {
 		(*item.target), err = td.Parse(
-			fmt.Sprintf("buildgo-%s-%s-%s-%s", build.Name, goos, goarch, item.name),
+			fmt.Sprintf("buildgo-%s-%s-%s-%s", build.ID, goos, goarch, item.name),
 			item.source,
 		)
 		if err != nil {
@@ -198,7 +198,7 @@ func (tar *goSingleTarget) Run(context *ctx.Context) error {
 		Filename: tar.Output,
 		Format:   ctx.FormatRaw,
 		Location: output,
-		Name:     tar.Name,
+		ID:       tar.ID,
 		OS:       tar.OS,
 	})
 

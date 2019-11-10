@@ -18,9 +18,9 @@ type Checksum struct {
 	// Builds specifies a build names to find related artifacts to
 	// calculate checksums of.
 	Builds []string
-	// Name specifies the checksum's name, as it stores in artifacts.
+	// ID specifies the checksum's name, as it stores in artifacts.
 	// Default: "checksum"
-	Name string
+	ID string
 	// Output is where the checksum file is going to be created
 	// Default: "{{.ProjectName}}-{{.Version}}-checksums.txt"
 	Output string
@@ -41,7 +41,7 @@ func NewChecksum() modules.Pluggable {
 	return &Checksum{
 		Algorithm: *algo,
 		Builds:    []string{"artifact"},
-		Name:      "checksum",
+		ID:        "checksum",
 		Output:    "{{.ProjectName}}-{{.Version}}-checksums.txt",
 	}
 }
@@ -54,7 +54,7 @@ func (checksum *Checksum) Run(context *ctx.Context) error {
 
 	checksumFilename := path.Join(context.TargetDir, output)
 
-	artifactMap := context.Artifacts.OsArchByNames(checksum.Builds, checksum.Skip)
+	artifactMap := context.Artifacts.OsArchByIDs(checksum.Builds, checksum.Skip)
 	if len(artifactMap) == 0 {
 		return nil
 	}
@@ -104,7 +104,7 @@ func (checksum *Checksum) Run(context *ctx.Context) error {
 	context.Artifacts.Add(&ctx.Artifact{
 		Filename: output,
 		Location: checksumFilename,
-		Name:     checksum.Name,
+		ID:       checksum.ID,
 	})
 
 	log.Printf("checksum file %s written", checksumFilename)
@@ -120,7 +120,7 @@ func (checksum *Checksum) parseOutput(context *ctx.Context) (string, error) {
 	}
 
 	output, err := td.Parse(
-		fmt.Sprintf("checksum-%s", checksum.Name),
+		fmt.Sprintf("checksum-%s", checksum.ID),
 		checksum.Output,
 	)
 	if err != nil {

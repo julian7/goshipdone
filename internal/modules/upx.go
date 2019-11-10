@@ -38,7 +38,7 @@ func (archive *UPX) Run(context *ctx.Context) error {
 		return err
 	}
 
-	artifactMap := context.Artifacts.OsArchByNames(archive.Builds, archive.Skip)
+	artifactMap := context.Artifacts.OsArchByIDs(archive.Builds, archive.Skip)
 	if len(artifactMap) == 0 {
 		return nil
 	}
