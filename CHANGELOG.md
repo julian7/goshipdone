@@ -12,9 +12,13 @@ Added:
 
 - publish only when defined
 - publish:scp
-- release_note:checksum
+- archive:checksum
 - archive:tar
 - archive:upx
 - basic structure, first services
+
+Changed:
+
+- fold release_note into archive
 
 [Unreleased]: https://github.com/julian7/magelib/tree/master

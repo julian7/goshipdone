@@ -29,9 +29,9 @@ type (
 		// Files contains a list of static files should be added to the
 		// archive file. They are interpretered as glob.
 		Files []string
-		// ID contains the artifact's name used by later stages of
-		// the build pipeline. Archives, ReleaseNotes, and Publishes
-		// may refer to this name for referencing build results.
+		// ID contains the artifact's name used by later stages of the build
+		// pipeline. Archives, and Publishes may refer to this name for
+		// referencing build results.
 		// Default: "archive".
 		ID string
 		// Output is where the build writes its output. Default:

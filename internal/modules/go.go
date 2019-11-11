@@ -23,9 +23,9 @@ type (
 		// GOArch is a list of all GOARCH variations required. It is
 		// set to [`amd64`] by default.
 		GOArch []string
-		// ID contains the artifact's name used by later stages of
-		// the build pipeline. Archives, ReleaseNotes, and Publishes
-		// may refer to this name for referencing build results.
+		// ID contains the artifact's name used by later stages of the build
+		// pipeline. Archives, and Publishes may refer to this name for
+		// referencing build results.
 		// Default: "default".
 		ID string
 		// LDFlags is a `modules.TemplateData` template for providing

@@ -26,7 +26,6 @@ archives:
       - builder
     compression: gzip
     id: targz
-release_notes:
   - type: checksum
     builds:
       - builder

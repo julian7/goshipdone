@@ -16,11 +16,10 @@ import (
 // BuildPipeline represents the whole build pipeline. Module objects
 // are loaded into BuildPipeline as read from .pipeline.yml.
 type BuildPipeline struct {
-	Setups       *modules.Modules `yaml:",omitempty"`
-	Builds       *modules.Modules `yaml:",omitempty"`
-	Archives     *modules.Modules `yaml:",omitempty"`
-	ReleaseNotes *modules.Modules `yaml:"release_notes,omitempty"`
-	Publishes    *modules.Modules `yaml:",omitempty"`
+	Setups    *modules.Modules `yaml:",omitempty"`
+	Builds    *modules.Modules `yaml:",omitempty"`
+	Archives  *modules.Modules `yaml:",omitempty"`
+	Publishes *modules.Modules `yaml:",omitempty"`
 }
 
 // LoadBuildPipeline creates a new BuildPipeline by reading YAML
@@ -28,11 +27,10 @@ type BuildPipeline struct {
 // are loaded, providing safe defaults.
 func LoadBuildPipeline(ymlcontent []byte) (*BuildPipeline, error) {
 	pipeline := &BuildPipeline{
-		Setups:       modules.NewModules("setup"),
-		Builds:       modules.NewModules("build"),
-		Archives:     modules.NewModules("archive"),
-		ReleaseNotes: modules.NewModules("release_note"),
-		Publishes:    modules.NewModules("publish"),
+		Setups:    modules.NewModules("setup"),
+		Builds:    modules.NewModules("build"),
+		Archives:  modules.NewModules("archive"),
+		Publishes: modules.NewModules("publish"),
 	}
 
 	pipeline.Publishes.SkipFn = func(context *ctx.Context) bool {
@@ -54,11 +52,10 @@ func LoadBuildPipeline(ymlcontent []byte) (*BuildPipeline, error) {
 // String returns a string representation of the build pipeline
 func (pipeline *BuildPipeline) String() string {
 	return fmt.Sprintf(
-		"{Setups:%v Builds:%v Archives:%v ReleaseNotes:%v Publishes:%v}",
+		"{Setups:%v Builds:%v Archives:%v Publishes:%v}",
 		pipeline.Setups,
 		pipeline.Builds,
 		pipeline.Archives,
-		pipeline.ReleaseNotes,
 		pipeline.Publishes,
 	)
 }
@@ -70,7 +67,6 @@ func (pipeline *BuildPipeline) Run() error {
 		pipeline.Setups,
 		pipeline.Builds,
 		pipeline.Archives,
-		pipeline.ReleaseNotes,
 		pipeline.Publishes,
 	}
 	ctx := &ctx.Context{}

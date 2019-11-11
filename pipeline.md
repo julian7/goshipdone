@@ -17,9 +17,6 @@ archive:
 - [ ] gzip
 - [x] tar
 - [ ] zip
-
-release_notes:
-
 - [ ] git-chglog
 - [ ] script
 - [ ] go run

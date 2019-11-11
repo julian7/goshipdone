@@ -61,12 +61,12 @@ func TestLoadBuildPipeline(t *testing.T) {
 					Modules: []modules.Module{
 						{Type: "project", Pluggable: intmod.NewProject()},
 						{Type: "git_tag", Pluggable: intmod.NewGitTag()},
+						{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
 					},
 				},
-				Builds:       &modules.Modules{Stage: "build"},
-				Archives:     &modules.Modules{Stage: "archive"},
-				ReleaseNotes: &modules.Modules{Stage: "release_note"},
-				Publishes:    &modules.Modules{Stage: "publish"},
+				Builds:    &modules.Modules{Stage: "build"},
+				Archives:  &modules.Modules{Stage: "archive"},
+				Publishes: &modules.Modules{Stage: "publish"},
 			},
 			false,
 		},
@@ -79,14 +79,14 @@ func TestLoadBuildPipeline(t *testing.T) {
 					Modules: []modules.Module{
 						{Type: "project", Pluggable: intmod.NewProject()},
 						{Type: "git_tag", Pluggable: intmod.NewGitTag()},
+						{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
 					},
 				},
 				Builds: &modules.Modules{Stage: "build"},
 				Archives: &modules.Modules{Stage: "archive", Modules: []modules.Module{
 					{Type: "test", Pluggable: testPluggableModuleFactory()},
 				}},
-				ReleaseNotes: &modules.Modules{Stage: "release_note"},
-				Publishes:    &modules.Modules{Stage: "publish"},
+				Publishes: &modules.Modules{Stage: "publish"},
 			},
 			false,
 		},
@@ -119,7 +119,7 @@ func TestBuildPipeline_Run(t *testing.T) {
 		reportCounterLock.Unlock()
 	}
 
-	for _, stage := range []string{"setup", "build", "archive", "release_note", "publish"} {
+	for _, stage := range []string{"setup", "build", "archive", "publish"} {
 		modules.RegisterModule(&modules.PluggableModule{
 			Kind: fmt.Sprintf("%s:success", stage),
 			Factory: func() modules.Pluggable {
@@ -155,55 +155,50 @@ func TestBuildPipeline_Run(t *testing.T) {
 	}
 
 	tests := []struct {
-		name         string
-		Setups       modules.Modules
-		Builds       modules.Modules
-		Archives     modules.Modules
-		ReleaseNotes modules.Modules
-		Publishes    modules.Modules
-		wantReport   int
-		wantErr      bool
+		name       string
+		Setups     modules.Modules
+		Builds     modules.Modules
+		Archives   modules.Modules
+		Publishes  modules.Modules
+		wantReport int
+		wantErr    bool
 	}{
 		{
-			name:         "empty",
-			Setups:       buildModule("setup"),
-			Builds:       buildModule("build"),
-			Archives:     buildModule("archive"),
-			ReleaseNotes: buildModule("release_note"),
-			Publishes:    buildModule("publish"),
-			wantReport:   0,
-			wantErr:      false,
+			name:       "empty",
+			Setups:     buildModule("setup"),
+			Builds:     buildModule("build"),
+			Archives:   buildModule("archive"),
+			Publishes:  buildModule("publish"),
+			wantReport: 0,
+			wantErr:    false,
 		},
 		{
-			name:         "success",
-			Setups:       buildModule("setup", "success"),
-			Builds:       buildModule("build", "success"),
-			Archives:     buildModule("archive", "success"),
-			ReleaseNotes: buildModule("release_note", "success"),
-			Publishes:    buildModule("publish", "success"),
-			wantReport:   5,
-			wantErr:      false,
+			name:       "success",
+			Setups:     buildModule("setup", "success"),
+			Builds:     buildModule("build", "success"),
+			Archives:   buildModule("archive", "success"),
+			Publishes:  buildModule("publish", "success"),
+			wantReport: 4,
+			wantErr:    false,
 		},
 		{
-			name:         "has error",
-			Setups:       buildModule("setup", "success"),
-			Builds:       buildModule("build", "success"),
-			Archives:     buildModule("archive", "failure"),
-			ReleaseNotes: buildModule("release_note", "success"),
-			Publishes:    buildModule("publish", "success"),
-			wantReport:   2,
-			wantErr:      true,
+			name:       "has error",
+			Setups:     buildModule("setup", "success"),
+			Builds:     buildModule("build", "success"),
+			Archives:   buildModule("archive", "failure"),
+			Publishes:  buildModule("publish", "success"),
+			wantReport: 2,
+			wantErr:    true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			reportCounter = 0
 			pipeline := &pipeline.BuildPipeline{
-				Setups:       &tt.Setups,
-				Builds:       &tt.Builds,
-				Archives:     &tt.Archives,
-				ReleaseNotes: &tt.ReleaseNotes,
-				Publishes:    &tt.Publishes,
+				Setups:    &tt.Setups,
+				Builds:    &tt.Builds,
+				Archives:  &tt.Archives,
+				Publishes: &tt.Publishes,
 			}
 			err := pipeline.Run()
 			if (err != nil) != tt.wantErr {

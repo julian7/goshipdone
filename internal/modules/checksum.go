@@ -30,7 +30,7 @@ type Checksum struct {
 
 func init() {
 	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "release_note:checksum",
+		Kind:    "archive:checksum",
 		Factory: NewChecksum,
 	})
 }
