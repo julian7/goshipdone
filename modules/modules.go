@@ -21,7 +21,8 @@ type (
 
 	// Modules is a list of Module-s of a single stage
 	Modules struct {
-		Stage   string   `yaml:"-"`
+		Stage   string `yaml:"-"`
+		SkipFn  func(*ctx.Context) bool
 		Modules []Module `yaml:"-"`
 	}
 
@@ -135,6 +136,18 @@ func (mod *Modules) Run(context *ctx.Context) error {
 	log.Printf("====> %s", strings.ToUpper(mod.Stage))
 	startMod := time.Now()
 
+	if mod.SkipFn != nil && mod.SkipFn(context) {
+		log.Printf("SKIPPED")
+	} else {
+		if err := mod.run(context); err != nil {
+			return err
+		}
+	}
+	log.Printf("<==== %s done in %s", strings.ToUpper(mod.Stage), time.Since(startMod))
+	return nil
+}
+
+func (mod *Modules) run(context *ctx.Context) error {
 	for _, module := range mod.Modules {
 		log.Printf("----> %s", module.Type)
 		start := time.Now()
@@ -151,7 +164,7 @@ func (mod *Modules) Run(context *ctx.Context) error {
 
 		log.Printf("<---- %s done in %s", module.Type, time.Since(start))
 	}
-	log.Printf("<==== %s done in %s", strings.ToUpper(mod.Stage), time.Since(startMod))
+
 	return nil
 }
 

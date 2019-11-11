@@ -5,7 +5,6 @@ package pipeline
 import (
 	"fmt"
 
-	// register archive modules
 	"github.com/julian7/magelib/ctx"
 	// register internal modules
 	_ "github.com/julian7/magelib/internal/modules"
@@ -36,12 +35,16 @@ func LoadBuildPipeline(ymlcontent []byte) (*BuildPipeline, error) {
 		Publishes:    modules.NewModules("publish"),
 	}
 
+	pipeline.Publishes.SkipFn = func(context *ctx.Context) bool {
+		return !context.Publish
+	}
+
 	err := yaml.Unmarshal(ymlcontent, pipeline)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, itemType := range []string{"project", "git_tag"} {
+	for _, itemType := range []string{"project", "git_tag", "skip_publish"} {
 		_ = pipeline.Setups.Add(itemType, nil, true)
 	}
 
