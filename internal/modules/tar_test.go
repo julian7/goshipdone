@@ -27,8 +27,8 @@ func Test_errNumTargets(t *testing.T) {
 			good: "good",
 			builds: map[string]*ctx.Artifacts{
 				"good": &ctx.Artifacts{
-					&ctx.Artifact{Location: "dist/good-linux-amd64/good", Filename: "good", Format: 1, ID: "good", OS: "linux", Arch: "amd64"},
-					&ctx.Artifact{Location: "dist/good-windows-amd64/good.exe", Filename: "good.exe", Format: 1, ID: "good", OS: "windows", Arch: "amd64"},
+					&ctx.Artifact{Location: "dist/good-linux-amd64/good", Filename: "good", ID: "good", OS: "linux", Arch: "amd64"},
+					&ctx.Artifact{Location: "dist/good-windows-amd64/good.exe", Filename: "good.exe", ID: "good", OS: "windows", Arch: "amd64"},
 				},
 			},
 			errStr: "no targets found for builds linux-amd64, windows-amd64",
@@ -39,11 +39,11 @@ func Test_errNumTargets(t *testing.T) {
 			good: "good",
 			builds: map[string]*ctx.Artifacts{
 				"good": &ctx.Artifacts{
-					&ctx.Artifact{Location: "dist/good-linux-amd64/good", Filename: "good", Format: 1, ID: "good", OS: "linux", Arch: "amd64"},
-					&ctx.Artifact{Location: "dist/good-windows-amd64/good.exe", Filename: "good.exe", Format: 1, ID: "good", OS: "windows", Arch: "amd64"},
+					&ctx.Artifact{Location: "dist/good-linux-amd64/good", Filename: "good", ID: "good", OS: "linux", Arch: "amd64"},
+					&ctx.Artifact{Location: "dist/good-windows-amd64/good.exe", Filename: "good.exe", ID: "good", OS: "windows", Arch: "amd64"},
 				},
 				"bad": &ctx.Artifacts{
-					&ctx.Artifact{Location: "dist/bad-linux-amd64/bad", Filename: "bad", Format: 1, ID: "bad", OS: "linux", Arch: "amd64"},
+					&ctx.Artifact{Location: "dist/bad-linux-amd64/bad", Filename: "bad", ID: "bad", OS: "linux", Arch: "amd64"},
 				},
 			},
 			errStr: "build bad is missing os-arch target windows-amd64",

@@ -193,7 +193,6 @@ func (target *tarSingleTarget) Run(context *ctx.Context) error {
 	context.Artifacts.Add(&ctx.Artifact{
 		Arch:     target.Arch,
 		Filename: target.Output,
-		Format:   ctx.FormatTar,
 		Location: archiveFile,
 		ID:       target.ID,
 		OS:       target.OS,

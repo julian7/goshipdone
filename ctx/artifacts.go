@@ -2,20 +2,6 @@ package ctx
 
 import "fmt"
 
-const (
-	_ = iota
-	// FormatRaw represents an artifact in its pristine format (eg. binary or ar archive)
-	FormatRaw
-	// FormatGZip represents an artifact in compressed format (eg. the raw format compressed with gzip)
-	FormatGZip
-	// FormatUPX represents an artifact compressed by UPX (self-uncompressing executable)
-	FormatUPX
-	// FormatTar represents an artifact put together into a TAR archive. It can be further compressed.
-	FormatTar
-	// FormatZip represents an artifact put together into a ZIP archive.
-	FormatZip
-)
-
 type (
 	// Artifacts is a slice of Artifact
 	Artifacts []*Artifact
@@ -26,7 +12,6 @@ type (
 	Artifact struct {
 		Arch     string
 		Filename string
-		Format   int
 		ID       string
 		Location string
 		OS       string

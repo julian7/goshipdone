@@ -55,11 +55,5 @@ func (archive *UPX) Run(context *ctx.Context) error {
 		return err
 	}
 
-	for osarch := range artifactMap {
-		for _, artifact := range *artifactMap[osarch] {
-			artifact.Format = ctx.FormatUPX
-		}
-	}
-
 	return nil
 }
