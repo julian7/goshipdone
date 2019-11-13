@@ -22,6 +22,10 @@ There are other goals on the horizon, which are not immediately important:
 - package generator (NPFM, scoop, homebrew)
 - docker builder (kaniko) as an archival tool
 
+## Try it
+
+Running `go run build/build.go` takes example .goshipdone.yml file, and runs it.
+
 ## Legal
 
 This project is licensed under [Blue Oak Model License v1.0.0](https://blueoakcouncil.org/license/1.0.0). It is not registered either at OSI or GNU, therefore GitHub is widely looking at the other direction. However, this is the license I'm most happy with: you can read and understand it with no legal degree, and there are no hidden or cryptic meanings in it.
