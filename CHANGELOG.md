@@ -19,6 +19,7 @@ Added:
 
 Changed:
 
+- rename project to goshipdone
 - fold release_note into archive
 
-[Unreleased]: https://github.com/julian7/magelib/tree/master
+[Unreleased]: https://github.com/julian7/goshipdone/tree/master

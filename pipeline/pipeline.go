@@ -5,11 +5,11 @@ package pipeline
 import (
 	"fmt"
 
-	"github.com/julian7/magelib/ctx"
+	"github.com/julian7/goshipdone/ctx"
 	// register internal modules
-	_ "github.com/julian7/magelib/internal/modules"
+	_ "github.com/julian7/goshipdone/internal/modules"
 
-	"github.com/julian7/magelib/modules"
+	"github.com/julian7/goshipdone/modules"
 	"gopkg.in/yaml.v3"
 )
 

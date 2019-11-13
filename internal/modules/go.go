@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/julian7/magelib/ctx"
-	"github.com/julian7/magelib/modules"
+	"github.com/julian7/goshipdone/ctx"
+	"github.com/julian7/goshipdone/modules"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )

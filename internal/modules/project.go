@@ -4,8 +4,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/julian7/magelib/ctx"
-	"github.com/julian7/magelib/modules"
+	"github.com/julian7/goshipdone/ctx"
+	"github.com/julian7/goshipdone/modules"
 )
 
 // Project is a module for setting basic project-specific data

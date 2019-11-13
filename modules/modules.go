@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/julian7/magelib/ctx"
+	"github.com/julian7/goshipdone/ctx"
 	"gopkg.in/yaml.v3"
 )
 

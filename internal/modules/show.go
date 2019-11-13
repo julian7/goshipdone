@@ -3,8 +3,8 @@ package modules
 import (
 	"log"
 
-	"github.com/julian7/magelib/ctx"
-	"github.com/julian7/magelib/modules"
+	"github.com/julian7/goshipdone/ctx"
+	"github.com/julian7/goshipdone/modules"
 )
 
 // Show is a module for listing all recorded artifacts so far

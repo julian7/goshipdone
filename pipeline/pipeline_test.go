@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/julian7/magelib/ctx"
-	intmod "github.com/julian7/magelib/internal/modules"
-	"github.com/julian7/magelib/modules"
-	"github.com/julian7/magelib/pipeline"
+	"github.com/julian7/goshipdone/ctx"
+	intmod "github.com/julian7/goshipdone/internal/modules"
+	"github.com/julian7/goshipdone/modules"
+	"github.com/julian7/goshipdone/pipeline"
 )
 
 type testPluggableModule struct {

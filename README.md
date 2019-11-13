@@ -1,8 +1,8 @@
-# Magelib
+# Go Ship Done
 
-[![GoDoc](https://godoc.org/github.com/julian7/magelib?status.svg)](https://godoc.org/github.com/julian7/magelib)
+[![GoDoc](https://godoc.org/github.com/julian7/goshipdone?status.svg)](https://godoc.org/github.com/julian7/goshipdone)
 
-This project aims to provide basic release functionality to any project using [magefile](https://magefile.org/).
+This project aims to provide basic release functionality to any project. Originally it was prepared to be used with [magefile](https://magefile.org/), but the service is generic enough to allow any kinds of use.
 
 PLEASE NOTE this project is still in early stages.
 
@@ -20,7 +20,7 @@ PLEASE NOTE this project is still in early stages.
 There are other goals on the horizon, which are not immediately important:
 
 - package generator (NPFM, scoop, homebrew)
-- docker builder (kaniko)
+- docker builder (kaniko) as an archival tool
 
 ## Legal
 
@@ -31,4 +31,3 @@ The project is also governed with [Contributor Covenant](https://contributor-cov
 ## Any issues?
 
 Open a ticket, perhaps a pull request. We support [GitHub Flow](https://guides.github.com/introduction/flow/). You might want to [fork](https://guides.github.com/activities/forking/) this project first.
-

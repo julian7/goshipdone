@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/julian7/magelib/pipeline"
+	"github.com/julian7/goshipdone/pipeline"
 )
 
 func main() {

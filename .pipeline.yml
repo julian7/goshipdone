@@ -1,8 +1,7 @@
 ---
 setup:
-  -
-    type: project
-    id: magelib
+  - type: project
+    id: goshipdone
     target: target
 builds:
   - type: go

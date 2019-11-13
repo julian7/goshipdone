@@ -6,8 +6,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/julian7/magelib/ctx"
-	"github.com/julian7/magelib/modules"
+	"github.com/julian7/goshipdone/ctx"
+	"github.com/julian7/goshipdone/modules"
 )
 
 // SkipPublish module controls whether publish phase should be executed, by

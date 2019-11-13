@@ -3,7 +3,7 @@ package modules
 import (
 	"testing"
 
-	"github.com/julian7/magelib/ctx"
+	"github.com/julian7/goshipdone/ctx"
 )
 
 func Test_errNumTargets(t *testing.T) {

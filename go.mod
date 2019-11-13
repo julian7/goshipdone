@@ -1,4 +1,4 @@
-module github.com/julian7/magelib
+module github.com/julian7/goshipdone
 
 go 1.13
 
