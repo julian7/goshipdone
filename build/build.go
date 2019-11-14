@@ -1,5 +1,3 @@
-//+build build
-
 // build command for running goshipdone for testing purposes
 package main
 

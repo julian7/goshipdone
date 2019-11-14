@@ -3,6 +3,7 @@ package modules
 import (
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/julian7/goshipdone/ctx"
 	"github.com/julian7/goshipdone/modules"
@@ -13,6 +14,12 @@ import (
 type (
 	// Go represents build:go module
 	Go struct {
+		// After is a list of commands have to be ran after builds.
+		// Any errors cancel the task.
+		After []string
+		// Before is a list of commands have to be ran before builds.
+		// Any errors cancel the task.
+		Before []string
 		// Env carries a map of environment variables given to
 		// `go build` command. GOOS and GOARCH will be automatically
 		// added.
@@ -97,8 +104,31 @@ func (build *Go) Run(context *ctx.Context) error {
 		return err
 	}
 
+	if err := build.runHooks(context, build.Before); err != nil {
+		return err
+	}
+
 	for _, tar := range targets {
 		if err := tar.Run(context); err != nil {
+			return err
+		}
+	}
+
+	if err := build.runHooks(context, build.After); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (build *Go) runHooks(context *ctx.Context, hooks []string) error {
+	if len(hooks) == 0 {
+		return nil
+	}
+
+	for _, hook := range hooks {
+		args := strings.Fields(hook)
+		if err := sh.RunWith(build.Env, args[0], args[1:]...); err != nil {
 			return err
 		}
 	}

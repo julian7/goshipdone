@@ -6,7 +6,7 @@ setup:
 builds:
   - type: go
     ldflags: "-s -w -X main.version={{.Version}}"
-    main: ./cmd/builder
+    main: ./build
     id: builder
     output: "builder{{.Ext}}"
     goos:
@@ -15,6 +15,10 @@ builds:
       - windows
     goarch:
       - amd64
+    before:
+      - go mod tidy
+      - go test ./...
+      - go generate ./...
 archives:
   - type: show
   - type: upx
