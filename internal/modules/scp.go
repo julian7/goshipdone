@@ -20,8 +20,9 @@ type SCP struct {
 }
 
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "publish:scp",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "publish",
+		Type:    "scp",
 		Factory: NewSCP,
 	})
 }

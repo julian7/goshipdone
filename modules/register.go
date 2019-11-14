@@ -1,5 +1,7 @@
 package modules
 
+import "fmt"
+
 // nolint: gochecknoglobals
 var modRegistry map[string]PluggableCache
 
@@ -14,42 +16,47 @@ type (
 		Loaded  bool
 	}
 
-	// PluggableModule is a Pluggable registration entry for
+	// ModuleRegistration is a Pluggable registration entry for
 	// module registration
-	PluggableModule struct {
-		// Kind is a string representation of stage/type how
-		// the module can be referred to. Format: "`stage`:`type`", like
-		// "build:script". To register a module for every stage, use
-		// "*:`type`" format.
-		Kind string
+	ModuleRegistration struct {
+		// Stage is a string representation of the stage the module is
+		// registered into. To register a module into every stage, specify
+		// "*" as stage.
+		Stage string
+		// Type is a string representation of the module's name.
+		Type string
 		// Factory is the factory method to create a new module
 		// with defaults.
 		Factory PluggableFactory
-		// Deps contains a list of Kind-s, which are required
-		// for this module.
+		// Deps contains a list of Kind-s (strings in a form of "stage:type"),
+		// which are required for this module.
 		Deps []string
 	}
 )
 
+func (mod *ModuleRegistration) Kind() string {
+	return fmt.Sprintf("%s:%s", mod.Stage, mod.Type)
+}
+
 // RegisterModule allows modules to register themselves during init(),
-// by providing a definition of type PluggableModule.
-func RegisterModule(definition *PluggableModule) {
+// by providing a definition of type ModuleRegistration.
+func RegisterModule(definition *ModuleRegistration) {
 	if modRegistry == nil {
 		modRegistry = make(map[string]PluggableCache)
 	}
 
-	modRegistry[definition.Kind] = PluggableCache{
+	modRegistry[definition.Kind()] = PluggableCache{
 		Factory: definition.Factory,
 		Loaded:  false,
 	}
-	copy(modRegistry[definition.Kind].Deps, definition.Deps)
+	copy(modRegistry[definition.Kind()].Deps, definition.Deps)
 }
 
 // MissingDepsForModule returns module's dependedcies, which weren't
 // loaded. It silently returns nil if module is not registered,
 // allowing dynamic modules to be passed through.
 //
-// Module is referenced by its `Kind`, see `PluggableModule`.
+// Module is referenced by its `Kind`, see `ModuleRegistration`.
 func MissingDepsForModule(kind string) []string {
 	mod, ok := modRegistry[kind]
 	if !ok {

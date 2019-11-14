@@ -46,8 +46,9 @@ type (
 )
 
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "archive:tar",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "archive",
+		Type:    "tar",
 		Factory: NewTar,
 		Deps:    []string{"setup:git_tag"},
 	})

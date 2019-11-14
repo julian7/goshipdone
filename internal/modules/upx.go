@@ -20,8 +20,9 @@ type UPX struct {
 
 //nolint: gochecknoinits
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "archive:upx",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "archive",
+		Type:    "upx",
 		Factory: NewUPX,
 	})
 }

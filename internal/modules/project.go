@@ -16,8 +16,9 @@ type Project struct {
 
 // nolint: gochecknoinits
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "setup:project",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "setup",
+		Type:    "project",
 		Factory: NewProject,
 	})
 }

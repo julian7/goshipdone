@@ -12,8 +12,9 @@ type Show struct{}
 
 // nolint: gochecknoinits
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "*:show",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "*",
+		Type:    "show",
 		Factory: NewShow,
 	})
 }

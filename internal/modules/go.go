@@ -69,8 +69,9 @@ type (
 
 // nolint: gochecknoinits
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "build:go",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "build",
+		Type:    "go",
 		Factory: NewGo,
 		Deps:    []string{"setup:git_tag"},
 	})

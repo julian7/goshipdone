@@ -29,8 +29,9 @@ type Checksum struct {
 }
 
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "archive:checksum",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "archive",
+		Type:    "checksum",
 		Factory: NewChecksum,
 	})
 }

@@ -23,8 +23,9 @@ type SkipPublish struct {
 
 // nolint: gochecknoinits
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "setup:skip_publish",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "setup",
+		Type:    "skip_publish",
 		Factory: NewSkipPublish,
 	})
 }

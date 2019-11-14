@@ -13,15 +13,15 @@ import (
 	"github.com/julian7/goshipdone/pipeline"
 )
 
-type testPluggableModule struct {
+type testModuleRegistration struct {
 	reporter func()
 }
 
-func testPluggableModuleFactory() modules.Pluggable {
-	return &testPluggableModule{}
+func testModuleRegistrationFactory() modules.Pluggable {
+	return &testModuleRegistration{}
 }
 
-func (mod *testPluggableModule) Run(*ctx.Context) error {
+func (mod *testModuleRegistration) Run(*ctx.Context) error {
 	if mod.reporter != nil {
 		mod.reporter()
 	}
@@ -29,21 +29,22 @@ func (mod *testPluggableModule) Run(*ctx.Context) error {
 	return nil
 }
 
-type testFailingPluggableModule struct{}
+type testFailingModuleRegistration struct{}
 
-func testFailingPluggableModuleFactory() modules.Pluggable {
-	return &testFailingPluggableModule{}
+func testFailingModuleRegistrationFactory() modules.Pluggable {
+	return &testFailingModuleRegistration{}
 }
 
-func (mod *testFailingPluggableModule) Run(*ctx.Context) error {
+func (mod *testFailingModuleRegistration) Run(*ctx.Context) error {
 	return errors.New("error")
 }
 
 // nolint: funlen
 func TestLoadBuildPipeline(t *testing.T) {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "archive:test",
-		Factory: testPluggableModuleFactory,
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "archive",
+		Type:    "test",
+		Factory: testModuleRegistrationFactory,
 	})
 
 	tests := []struct {
@@ -84,7 +85,7 @@ func TestLoadBuildPipeline(t *testing.T) {
 				},
 				Builds: &modules.Modules{Stage: "build"},
 				Archives: &modules.Modules{Stage: "archive", Modules: []modules.Module{
-					{Type: "test", Pluggable: testPluggableModuleFactory()},
+					{Type: "test", Pluggable: testModuleRegistrationFactory()},
 				}},
 				Publishes: &modules.Modules{Stage: "publish"},
 			},
@@ -120,15 +121,17 @@ func TestBuildPipeline_Run(t *testing.T) {
 	}
 
 	for _, stage := range []string{"setup", "build", "archive", "publish"} {
-		modules.RegisterModule(&modules.PluggableModule{
-			Kind: fmt.Sprintf("%s:success", stage),
+		modules.RegisterModule(&modules.ModuleRegistration{
+			Stage: stage,
+			Type:  "success",
 			Factory: func() modules.Pluggable {
-				return &testPluggableModule{reporter: reporter}
+				return &testModuleRegistration{reporter: reporter}
 			},
 		})
-		modules.RegisterModule(&modules.PluggableModule{
-			Kind:    fmt.Sprintf("%s:failure", stage),
-			Factory: testFailingPluggableModuleFactory,
+		modules.RegisterModule(&modules.ModuleRegistration{
+			Stage:   stage,
+			Type:    "failure",
+			Factory: testFailingModuleRegistrationFactory,
 		})
 	}
 

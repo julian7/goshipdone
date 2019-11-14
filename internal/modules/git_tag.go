@@ -14,8 +14,9 @@ type GitTag struct{}
 
 // nolint: gochecknoinits
 func init() {
-	modules.RegisterModule(&modules.PluggableModule{
-		Kind:    "setup:git_tag",
+	modules.RegisterModule(&modules.ModuleRegistration{
+		Stage:   "setup",
+		Type:    "git_tag",
 		Factory: NewGitTag,
 	})
 }
