@@ -61,7 +61,7 @@ func TestLoadBuildPipeline(t *testing.T) {
 					Stage: "setup",
 					Modules: []modules.Module{
 						{Type: "project", Pluggable: intmod.NewProject()},
-						{Type: "git_tag", Pluggable: intmod.NewGitTag()},
+						{Type: "git_tag", Pluggable: intmod.NewGit()},
 						{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
 					},
 				},
@@ -79,7 +79,7 @@ func TestLoadBuildPipeline(t *testing.T) {
 					Stage: "setup",
 					Modules: []modules.Module{
 						{Type: "project", Pluggable: intmod.NewProject()},
-						{Type: "git_tag", Pluggable: intmod.NewGitTag()},
+						{Type: "git_tag", Pluggable: intmod.NewGit()},
 						{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
 					},
 				},

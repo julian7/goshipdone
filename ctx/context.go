@@ -10,4 +10,15 @@ type Context struct {
 	Publish     bool
 	TargetDir   string
 	Version     string
+	Git         GitData
+}
+
+// GitData contains git-specific information on the repository
+type GitData struct {
+	// Tag contains git tag information, if the repo is on a specific tag
+	Tag string
+	// Ref contains the full SHA1 checksum of the current commit
+	Ref string
+	// URL contains git repo's URL, collected from current branch's upstream
+	URL string
 }
