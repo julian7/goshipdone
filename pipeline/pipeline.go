@@ -42,7 +42,7 @@ func LoadBuildPipeline(ymlcontent []byte) (*BuildPipeline, error) {
 		return nil, err
 	}
 
-	for _, itemType := range []string{"project", "git_tag", "skip_publish"} {
+	for _, itemType := range []string{"env", "project", "git_tag", "skip_publish"} {
 		_ = pipeline.Setups.Add(itemType, nil, true)
 	}
 

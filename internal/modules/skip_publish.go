@@ -3,7 +3,6 @@ package modules
 import (
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 
 	"github.com/julian7/goshipdone/ctx"
@@ -38,7 +37,7 @@ func NewSkipPublish() modules.Pluggable {
 }
 
 func (mod *SkipPublish) Run(context *ctx.Context) error {
-	if variable, ok := os.LookupEnv(mod.EnvName); ok {
+	if variable, ok := context.Env.Get(mod.EnvName); ok {
 		skip, err := strconv.ParseBool(variable)
 		if err != nil {
 			return fmt.Errorf("parsing %s as bool: %w", mod.EnvName, err)

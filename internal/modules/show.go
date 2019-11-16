@@ -2,6 +2,7 @@ package modules
 
 import (
 	"log"
+	"sort"
 
 	"github.com/julian7/goshipdone/ctx"
 	"github.com/julian7/goshipdone/modules"
@@ -26,6 +27,17 @@ func NewShow() modules.Pluggable {
 
 // Run provides a list of artifacts recorded so far
 func (Show) Run(context *ctx.Context) error {
+	envKeys := make([]string, 0, len(context.Env))
+	for key := range context.Env {
+		envKeys = append(envKeys, key)
+	}
+	sort.Strings(envKeys)
+
+	log.Printf("Environment:")
+	for _, env := range envKeys {
+		log.Printf("- %s = %q", env, context.Env[env])
+	}
+	log.Printf("Artifacts:")
 	for _, art := range context.Artifacts {
 		log.Printf("- %s: %s (%s)", art.ID, art.Filename, art.OsArch())
 	}
