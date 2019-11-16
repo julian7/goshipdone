@@ -20,10 +20,6 @@ type (
 		// Before is a list of commands have to be ran before builds.
 		// Any errors cancel the task.
 		Before []string
-		// Env carries a map of environment variables given to
-		// `go build` command. GOOS and GOARCH will be automatically
-		// added.
-		Env map[string]string
 		// GOOS is a list of all GOOS variations required. It is
 		// set to [`windows`, `linux`] by default.
 		GOOS []string
@@ -64,7 +60,7 @@ type (
 
 	goSingleTarget struct {
 		Arch    string
-		Env     map[string]string
+		Env     ctx.Env
 		ID      string
 		LDFlags string
 		OutDir  string
@@ -128,7 +124,7 @@ func (build *Go) runHooks(context *ctx.Context, hooks []string) error {
 
 	for _, hook := range hooks {
 		args := strings.Fields(hook)
-		if err := sh.RunWith(build.Env, args[0], args[1:]...); err != nil {
+		if err := sh.RunWith(context.Env, args[0], args[1:]...); err != nil {
 			return err
 		}
 	}
@@ -176,14 +172,14 @@ func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (module
 
 	tar := &goSingleTarget{
 		Arch: goarch,
-		Env:  map[string]string{},
+		Env:  ctx.NewEnv(),
 		ID:   build.ID,
 		Main: build.Main,
 		OS:   goos,
 	}
 
-	for key, val := range build.Env {
-		tar.Env[key] = val
+	for key, val := range context.Env {
+		tar.Env.Set(key, val)
 	}
 
 	tar.Env["GOOS"] = goos

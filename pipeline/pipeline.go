@@ -69,7 +69,7 @@ func (pipeline *BuildPipeline) Run() error {
 		pipeline.Archives,
 		pipeline.Publishes,
 	}
-	ctx := &ctx.Context{}
+	ctx := ctx.New()
 
 	for _, step := range steps {
 		if err := step.Run(ctx); err != nil {
