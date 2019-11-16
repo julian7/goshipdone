@@ -24,6 +24,7 @@ type (
 		Stage   string `yaml:"-"`
 		SkipFn  func(*ctx.Context) bool
 		Modules []Module `yaml:"-"`
+		loaded  map[string]bool
 	}
 
 	// Module is a single module, specifying its type and its Pluggable
@@ -87,10 +88,6 @@ func (mod *Modules) Add(itemType string, node *yaml.Node, once bool) error {
 	for _, stage := range []string{mod.Stage, "*"} {
 		kind = fmt.Sprintf("%s:%s", stage, itemType)
 
-		if once && isLoaded(kind) {
-			return fmt.Errorf("module %s already loaded", kind)
-		}
-
 		targetModFactory, ok = LookupModule(kind)
 		if ok {
 			break
@@ -99,6 +96,10 @@ func (mod *Modules) Add(itemType string, node *yaml.Node, once bool) error {
 
 	if !ok {
 		return fmt.Errorf("unknown module %s:%s", mod.Stage, itemType)
+	}
+
+	if once && mod.isLoaded(kind) {
+		return fmt.Errorf("module %s already loaded", kind)
 	}
 
 	targetMod := targetModFactory()
@@ -114,7 +115,27 @@ func (mod *Modules) Add(itemType string, node *yaml.Node, once bool) error {
 		Pluggable: targetMod,
 	})
 
+	mod.flagLoaded(kind)
+
 	return nil
+}
+
+func (mod *Modules) isLoaded(kind string) bool {
+	if mod.loaded == nil {
+		return false
+	}
+
+	_, loaded := mod.loaded[kind]
+
+	return loaded
+}
+
+func (mod *Modules) flagLoaded(kind string) {
+	if mod.loaded == nil {
+		mod.loaded = map[string]bool{}
+	}
+
+	mod.loaded[kind] = true
 }
 
 func (mod *Modules) String() string {
@@ -151,12 +172,6 @@ func (mod *Modules) run(context *ctx.Context) error {
 	for _, module := range mod.Modules {
 		log.Printf("----> %s", module.Type)
 		start := time.Now()
-
-		missing := MissingDepsForModule(fmt.Sprintf("%s:%s", mod.Stage, module.Type))
-
-		if len(missing) > 0 {
-			return fmt.Errorf("missing dependencies: %s", strings.Join(missing, ", "))
-		}
 
 		if err := module.Pluggable.Run(context); err != nil {
 			return fmt.Errorf("%s:%s: %w", mod.Stage, module.Type, err)

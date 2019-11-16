@@ -76,7 +76,6 @@ func init() {
 		Stage:   "build",
 		Type:    "go",
 		Factory: NewGo,
-		Deps:    []string{"setup:git_tag"},
 	})
 }
 

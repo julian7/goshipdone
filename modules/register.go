@@ -3,18 +3,11 @@ package modules
 import "fmt"
 
 // nolint: gochecknoglobals
-var modRegistry map[string]*PluggableCache
+var modRegistry map[string]PluggableFactory
 
 type (
 	// PluggableFactory is a method, which yields a Pluggable
 	PluggableFactory func() Pluggable
-
-	// PluggableCache is a registry entry for a Pluggable
-	PluggableCache struct {
-		Factory PluggableFactory
-		Deps    []string
-		Loaded  bool
-	}
 
 	// ModuleRegistration is a Pluggable registration entry for
 	// module registration
@@ -28,9 +21,6 @@ type (
 		// Factory is the factory method to create a new module
 		// with defaults.
 		Factory PluggableFactory
-		// Deps contains a list of Kind-s (strings in a form of "stage:type"),
-		// which are required for this module.
-		Deps []string
 	}
 )
 
@@ -42,36 +32,10 @@ func (mod *ModuleRegistration) Kind() string {
 // by providing a definition of type ModuleRegistration.
 func RegisterModule(definition *ModuleRegistration) {
 	if modRegistry == nil {
-		modRegistry = make(map[string]*PluggableCache)
+		modRegistry = make(map[string]PluggableFactory)
 	}
 
-	modRegistry[definition.Kind()] = &PluggableCache{
-		Factory: definition.Factory,
-		Loaded:  false,
-	}
-	copy(modRegistry[definition.Kind()].Deps, definition.Deps)
-}
-
-// MissingDepsForModule returns module's dependedcies, which weren't
-// loaded. It silently returns nil if module is not registered,
-// allowing dynamic modules to be passed through.
-//
-// Module is referenced by its `Kind`, see `ModuleRegistration`.
-func MissingDepsForModule(kind string) []string {
-	mod, ok := modRegistry[kind]
-	if !ok {
-		return nil
-	}
-
-	missing := []string{}
-
-	for _, dep := range mod.Deps {
-		if !isLoaded(dep) {
-			missing = append(missing, dep)
-		}
-	}
-
-	return missing
+	modRegistry[definition.Kind()] = definition.Factory
 }
 
 // LookupModule returns a PluggableFactory based on its Kind
@@ -79,18 +43,8 @@ func MissingDepsForModule(kind string) []string {
 func LookupModule(kind string) (PluggableFactory, bool) {
 	mod, ok := modRegistry[kind]
 	if ok {
-		mod.Loaded = true
-		return mod.Factory, true
+		return mod, true
 	}
 
 	return nil, false
-}
-
-func isLoaded(kind string) bool {
-	mod, ok := modRegistry[kind]
-	if ok {
-		return mod.Loaded
-	}
-
-	return false
 }

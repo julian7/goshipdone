@@ -20,6 +20,10 @@ Fixed:
 - default mods overrode loaded ones
 - archive:changelog to cut only the last release announcement
 
+Removed:
+
+- module dependencies
+
 ## [v0.1.0] - 2019-11-16
 
 Added:

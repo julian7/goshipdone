@@ -50,7 +50,6 @@ func init() {
 		Stage:   "archive",
 		Type:    "tar",
 		Factory: NewTar,
-		Deps:    []string{"setup:git_tag"},
 	})
 }
 
