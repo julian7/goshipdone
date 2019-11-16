@@ -43,7 +43,7 @@ func (*Env) Run(context *ctx.Context) error {
 		for _, homeEnv := range []string{EnvHome, EnvHomePath} {
 			home, ok := context.Env.Get(homeEnv)
 			if ok {
-				context.Env.Set(home, path.Join(
+				context.Env.Set(EnvConfigHome, path.Join(
 					home,
 					".config",
 				))
