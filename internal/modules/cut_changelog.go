@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	reCut             = `(?ms)^(## \[(?i:%s)\].+)\n(?:## |\[.+?\]:)`
+	reCut             = `(?ms)^(## \[(?i:%s)\].+?)\n(?:## |\[.+?\]:)`
 	reHasSplitLinks   = `^## \[.+?\][^:]`
 	reLinkResolutions = `(?m)^\[(.+?)\]:\s*(.+)$`
 	reDuplicateLinks  = `(?s)(\[.+\]\(.+?\))\(.+?\)`

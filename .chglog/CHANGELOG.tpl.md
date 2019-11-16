@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 {{- if .Unreleased.CommitGroups }}{{ range .Unreleased.CommitGroups }}
 
 {{ .Title }}:
-{{- range .Commits }}
+{{ range .Commits }}
 - {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }}
 {{- end }}
 {{- end }}
