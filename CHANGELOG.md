@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Added:
 
+- archive:changelog, taking current label entry
 - setup:env, with internal env.var handling
 - publish:github
 - publish only when defined

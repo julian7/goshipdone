@@ -21,6 +21,8 @@ builds:
       - go generate ./...
 archives:
   - type: show
+  - type: changelog
+    id: changelog
   - type: upx
     builds:
       - builder
@@ -40,8 +42,15 @@ archives:
     output: "{{.ProjectName}}-{{.Version}}-checksums.txt"
 publishes:
   - type: show
-  - type: scp
+  - type: github
     builds:
       - targz
       - buildchecksum
-    target: staticfiles@remoteserver.com:/var/www/default/public
+    owner: julian7
+    name: goshipdone
+    release_notes: changelog
+  # - type: scp
+  #   builds:
+  #     - targz
+  #     - buildchecksum
+  #   target: staticfiles@remoteserver.com:/var/www/default/public
