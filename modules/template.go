@@ -18,6 +18,8 @@ type TemplateData struct {
 	Arch string
 	// ArchiveName defines a URL where the resource will be remotely available
 	ArchiveName string
+	// Env is a copy of environment variables set in ctx.Context
+	Env *ctx.Env
 	// Git is a copy of git-related info from ctx.Context
 	Git *ctx.GitData
 	// OS defines target operating system
@@ -32,9 +34,10 @@ type TemplateData struct {
 
 func NewTemplate(context *ctx.Context) *TemplateData {
 	return &TemplateData{
+		Env:         &context.Env,
+		Git:         context.Git,
 		ProjectName: context.ProjectName,
 		Version:     context.Version,
-		Git:         context.Git,
 	}
 }
 
@@ -52,5 +55,5 @@ func (td *TemplateData) Parse(name, text string) (string, error) {
 		return "", err
 	}
 
-	return out.String(), nil
+	return td.Env.Expand(out.String()), nil
 }

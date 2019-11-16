@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+Added:
+
+- variable expansion for modules.TemplateData.Parse
+
 Changed:
 
 - upgrade to go-github/v28
