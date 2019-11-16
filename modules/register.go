@@ -3,7 +3,7 @@ package modules
 import "fmt"
 
 // nolint: gochecknoglobals
-var modRegistry map[string]PluggableCache
+var modRegistry map[string]*PluggableCache
 
 type (
 	// PluggableFactory is a method, which yields a Pluggable
@@ -42,10 +42,10 @@ func (mod *ModuleRegistration) Kind() string {
 // by providing a definition of type ModuleRegistration.
 func RegisterModule(definition *ModuleRegistration) {
 	if modRegistry == nil {
-		modRegistry = make(map[string]PluggableCache)
+		modRegistry = make(map[string]*PluggableCache)
 	}
 
-	modRegistry[definition.Kind()] = PluggableCache{
+	modRegistry[definition.Kind()] = &PluggableCache{
 		Factory: definition.Factory,
 		Loaded:  false,
 	}
