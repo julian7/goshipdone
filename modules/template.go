@@ -3,6 +3,8 @@ package modules
 import (
 	"bytes"
 	"text/template"
+
+	"github.com/julian7/goshipdone/ctx"
 )
 
 // TemplateData is the data all template-based text replacement takes place.
@@ -16,6 +18,8 @@ type TemplateData struct {
 	Arch string
 	// ArchiveName defines a URL where the resource will be remotely available
 	ArchiveName string
+	// Git is a copy of git-related info from ctx.Context
+	Git *ctx.GitData
 	// OS defines target operating system
 	OS string
 	// ProjectName defines local filename of the resource
@@ -24,6 +28,14 @@ type TemplateData struct {
 	Version string
 	// Ext contains executable extension
 	Ext string
+}
+
+func NewTemplate(context *ctx.Context) *TemplateData {
+	return &TemplateData{
+		ProjectName: context.ProjectName,
+		Version:     context.Version,
+		Git:         context.Git,
+	}
 }
 
 // Parse parses a string based on TemplateData, and returns output in string format

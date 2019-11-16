@@ -135,13 +135,10 @@ func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts)
 		ret.Files[i] = archive.Files[i]
 	}
 
-	td := &modules.TemplateData{
-		Arch:        ret.Arch,
-		ProjectName: context.ProjectName,
-		OS:          ret.OS,
-		Version:     context.Version,
-		Ext:         archive.Compression.Extension(),
-	}
+	td := modules.NewTemplate(context)
+	td.Arch = ret.Arch
+	td.OS = ret.OS
+	td.Ext = archive.Compression.Extension()
 
 	for _, task := range []struct {
 		name   string

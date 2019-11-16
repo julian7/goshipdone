@@ -114,11 +114,8 @@ func (checksum *Checksum) Run(context *ctx.Context) error {
 }
 
 func (checksum *Checksum) parseOutput(context *ctx.Context) (string, error) {
-	td := &modules.TemplateData{
-		Algo:        checksum.Algorithm.String(),
-		ProjectName: context.ProjectName,
-		Version:     context.Version,
-	}
+	td := modules.NewTemplate(context)
+	td.Algo = checksum.Algorithm.String()
 
 	output, err := td.Parse("checksum", checksum.Output)
 	if err != nil {

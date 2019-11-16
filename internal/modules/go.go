@@ -159,12 +159,9 @@ func (build *Go) targets(context *ctx.Context) ([]modules.Pluggable, error) {
 }
 
 func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.Pluggable, error) {
-	td := &modules.TemplateData{
-		Arch:        goarch,
-		ProjectName: context.ProjectName,
-		OS:          goos,
-		Version:     context.Version,
-	}
+	td := modules.NewTemplate(context)
+	td.Arch = goarch
+	td.OS = goos
 
 	if goos == "windows" {
 		td.Ext = ".exe"
