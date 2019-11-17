@@ -28,8 +28,6 @@ func NewGit() modules.Pluggable {
 
 // Run records git tag information into ctx.Context
 func (setup *Git) Run(context *ctx.Context) error {
-	var lastTag string
-
 	items := []struct {
 		name     string
 		required bool
@@ -37,7 +35,7 @@ func (setup *Git) Run(context *ctx.Context) error {
 		args     []string
 	}{
 		{"version info", true, &context.Version, []string{"describe", "--tags", "--always", "--dirty"}},
-		{"current tag", false, &lastTag, []string{"describe", "--exact-match", "--tags"}},
+		{"current tag", false, &context.Git.Tag, []string{"describe", "--exact-match", "--tags"}},
 		{"current ref", true, &context.Git.Ref, []string{"-P", "show", "--format=%H", "-s"}},
 		{"url", false, &context.Git.URL, []string{"ls-remote", "--get-url"}},
 	}
