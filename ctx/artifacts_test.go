@@ -27,6 +27,7 @@ func TestArtifacts_Add(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			tt.artifacts.Add(tt.arg)
 
@@ -61,6 +62,7 @@ func TestArtifacts_ByID(t *testing.T) {
 		}, "a", 2},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.Artifacts.ByID(tt.nameArg); len(*got) != tt.wantCount {
 				t.Errorf("Artifacts.ByID() = %v, want %v item(s)", got, tt.wantCount)

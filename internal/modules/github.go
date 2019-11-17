@@ -47,6 +47,7 @@ type GitHub struct {
 	URL string
 }
 
+// nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "publish",
@@ -67,7 +68,9 @@ func NewGitHub() modules.Pluggable {
 
 func (mod *GitHub) Run(context *ctx.Context) error {
 	var notes string
+
 	relNotes := []*ctx.Artifact(*context.Artifacts.ByID(mod.ReleaseNotes))
+
 	switch len(relNotes) {
 	case 0:
 		return errors.New("release notes not found")
@@ -76,6 +79,7 @@ func (mod *GitHub) Run(context *ctx.Context) error {
 		if err != nil {
 			return fmt.Errorf("reading release notes: %w", err)
 		}
+
 		notes = string(content)
 	default:
 		return errors.New("multiple release notes found")
@@ -138,6 +142,7 @@ func (mod *GitHub) getToken(context *ctx.Context) string {
 
 func (mod *GitHub) getTLSConfig() *tls.Config {
 	return &tls.Config{
+		// nolint: gosec
 		InsecureSkipVerify: mod.SkipTLSVerify,
 		MinVersion:         tls.VersionTLS12,
 	}

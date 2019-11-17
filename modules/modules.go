@@ -155,22 +155,24 @@ func (mod *Modules) String() string {
 // one by one.
 func (mod *Modules) Run(context *ctx.Context) error {
 	log.Printf("====> %s", strings.ToUpper(mod.Stage))
+
 	startMod := time.Now()
 
 	if mod.SkipFn != nil && mod.SkipFn(context) {
 		log.Printf("SKIPPED")
-	} else {
-		if err := mod.run(context); err != nil {
-			return err
-		}
+	} else if err := mod.run(context); err != nil {
+		return err
 	}
+
 	log.Printf("<==== %s done in %s", strings.ToUpper(mod.Stage), time.Since(startMod))
+
 	return nil
 }
 
 func (mod *Modules) run(context *ctx.Context) error {
 	for _, module := range mod.Modules {
 		log.Printf("----> %s", module.Type)
+
 		start := time.Now()
 
 		if err := module.Pluggable.Run(context); err != nil {

@@ -26,11 +26,13 @@ func (arts *Artifacts) Add(artifact *Artifact) {
 // ByID searches artifacts by their build IDs
 func (arts *Artifacts) ByID(id string) *Artifacts {
 	results := &Artifacts{}
+
 	for i := range *arts {
 		if (*arts)[i].ID == id {
 			*results = append(*results, (*arts)[i])
 		}
 	}
+
 	return results
 }
 
@@ -54,6 +56,7 @@ func (arts *Artifacts) OsArchByIDs(ids []string, skips []string) map[string]*Art
 			if _, ok := builds[osarch]; !ok {
 				builds[osarch] = &Artifacts{}
 			}
+
 			*builds[osarch] = append(*builds[osarch], art)
 		}
 	}

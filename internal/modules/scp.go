@@ -19,6 +19,7 @@ type SCP struct {
 	Target string
 }
 
+// nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "publish",
@@ -41,6 +42,7 @@ func (scp *SCP) Run(context *ctx.Context) error {
 	builds := context.Artifacts.OsArchByIDs(scp.Builds, scp.Skip)
 
 	cmdArgs := []string{}
+
 	for osarch := range builds {
 		for _, artifact := range *builds[osarch] {
 			cmdArgs = append(cmdArgs, artifact.Location)

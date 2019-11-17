@@ -9,8 +9,8 @@ import (
 )
 
 type (
-	// Compresser defines compression interface
-	Compresser interface {
+	// Compressor defines compression interface
+	Compressor interface {
 		fmt.Stringer
 		Extension() string
 		Writer(io.Writer) io.WriteCloser
@@ -18,7 +18,7 @@ type (
 
 	// Compression is a YAML representation of a compression format
 	Compression struct {
-		Compresser
+		Compressor
 	}
 
 	// CompressNONE defines a flowthrough compression
@@ -35,7 +35,7 @@ type (
 // UnmarshalYAML detects compression format
 func (c *Compression) UnmarshalYAML(node *yaml.Node) error {
 	if node.Kind != yaml.ScalarNode {
-		return fmt.Errorf("compression is `%v`, not scalar!", node.Kind)
+		return fmt.Errorf("compression is `%v`, not scalar", node.Kind)
 	}
 
 	var compressString string
@@ -51,6 +51,7 @@ func (c *Compression) UnmarshalYAML(node *yaml.Node) error {
 	default:
 		return fmt.Errorf("invalid compression format: `%s`", compressString)
 	}
+
 	return nil
 }
 

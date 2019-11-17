@@ -45,6 +45,7 @@ type (
 	}
 )
 
+// nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "archive",
@@ -92,14 +93,18 @@ func validateBuilds(builds map[string]*ctx.Artifacts) error {
 
 	for osarch := range builds {
 		targets := len(*builds[osarch])
+
 		if numTargets == 0 {
 			numTargets = targets
 			lastosarch = osarch
+
 			continue
 		}
+
 		if numTargets < targets {
 			return errNumTargets(lastosarch, osarch, builds)
 		}
+
 		if numTargets > targets {
 			return errNumTargets(osarch, lastosarch, builds)
 		}
@@ -154,6 +159,7 @@ func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts)
 			return nil, fmt.Errorf("rendering %q: %w", task.source, err)
 		}
 	}
+
 	ret.Output = path.Clean(ret.Output)
 
 	return ret, nil
@@ -271,19 +277,22 @@ func (target *tarSingleTarget) writeDirs(tw *tar.Writer, fullpath string) error 
 	if fullpath == "." {
 		return nil
 	}
+
 	dirs := []string{fullpath}
+
 	for {
 		fullpath = path.Dir(fullpath)
 		if fullpath == "." {
 			break
 		}
+
 		dirs = append(dirs, fullpath)
 	}
 
 	for i := range dirs {
 		dirname := dirs[len(dirs)-i-1]
 
-		if err := target.writeDir(tw, dirname, 0o755); err != nil {
+		if err := target.writeDir(tw, dirname); err != nil {
 			return fmt.Errorf("cannot create directory %s: %w", dirname, err)
 		}
 	}
@@ -291,7 +300,7 @@ func (target *tarSingleTarget) writeDirs(tw *tar.Writer, fullpath string) error 
 	return nil
 }
 
-func (target *tarSingleTarget) writeDir(tw *tar.Writer, dirname string, mode int64) error {
+func (target *tarSingleTarget) writeDir(tw *tar.Writer, dirname string) error {
 	if _, ok := target.DirsWritten[dirname]; ok {
 		return nil
 	}
@@ -319,6 +328,7 @@ func (target *tarSingleTarget) writeDir(tw *tar.Writer, dirname string, mode int
 
 func errNumTargets(bad, good string, builds map[string]*ctx.Artifacts) error {
 	targets := map[string]bool{}
+
 	if len(builds) == 0 {
 		return fmt.Errorf("no builds found")
 	}
@@ -340,6 +350,7 @@ func errNumTargets(bad, good string, builds map[string]*ctx.Artifacts) error {
 	}
 
 	var goodTargets, badTargets []string
+
 	for name := range targets {
 		if targets[name] {
 			goodTargets = append(goodTargets, name)
@@ -347,6 +358,7 @@ func errNumTargets(bad, good string, builds map[string]*ctx.Artifacts) error {
 			badTargets = append(badTargets, name)
 		}
 	}
+
 	sort.Strings(goodTargets)
 	sort.Strings(badTargets)
 

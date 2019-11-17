@@ -6,6 +6,7 @@ import (
 	"github.com/julian7/goshipdone/ctx"
 )
 
+// nolint: funlen
 func Test_errNumTargets(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -26,9 +27,21 @@ func Test_errNumTargets(t *testing.T) {
 			bad:  "bad",
 			good: "good",
 			builds: map[string]*ctx.Artifacts{
-				"good": &ctx.Artifacts{
-					&ctx.Artifact{Location: "dist/good-linux-amd64/good", Filename: "good", ID: "good", OS: "linux", Arch: "amd64"},
-					&ctx.Artifact{Location: "dist/good-windows-amd64/good.exe", Filename: "good.exe", ID: "good", OS: "windows", Arch: "amd64"},
+				"good": {
+					&ctx.Artifact{
+						Location: "dist/good-linux-amd64/good",
+						Filename: "good",
+						ID:       "good",
+						OS:       "linux",
+						Arch:     "amd64",
+					},
+					&ctx.Artifact{
+						Location: "dist/good-windows-amd64/good.exe",
+						Filename: "good.exe",
+						ID:       "good",
+						OS:       "windows",
+						Arch:     "amd64",
+					},
 				},
 			},
 			errStr: "no targets found for builds linux-amd64, windows-amd64",
@@ -38,11 +51,23 @@ func Test_errNumTargets(t *testing.T) {
 			bad:  "bad",
 			good: "good",
 			builds: map[string]*ctx.Artifacts{
-				"good": &ctx.Artifacts{
-					&ctx.Artifact{Location: "dist/good-linux-amd64/good", Filename: "good", ID: "good", OS: "linux", Arch: "amd64"},
-					&ctx.Artifact{Location: "dist/good-windows-amd64/good.exe", Filename: "good.exe", ID: "good", OS: "windows", Arch: "amd64"},
+				"good": {
+					&ctx.Artifact{
+						Location: "dist/good-linux-amd64/good",
+						Filename: "good",
+						ID:       "good",
+						OS:       "linux",
+						Arch:     "amd64",
+					},
+					&ctx.Artifact{
+						Location: "dist/good-windows-amd64/good.exe",
+						Filename: "good.exe",
+						ID:       "good",
+						OS:       "windows",
+						Arch:     "amd64",
+					},
 				},
-				"bad": &ctx.Artifacts{
+				"bad": {
 					&ctx.Artifact{Location: "dist/bad-linux-amd64/bad", Filename: "bad", ID: "bad", OS: "linux", Arch: "amd64"},
 				},
 			},
@@ -50,11 +75,13 @@ func Test_errNumTargets(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			err := errNumTargets(tt.bad, tt.good, tt.builds)
 			if err == nil {
 				t.Errorf("unexpected succes")
 			}
+
 			if err.Error() != tt.errStr {
 				t.Errorf("errNumTargets() error = %v, want error string %s", err, tt.errStr)
 			}

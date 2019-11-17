@@ -197,6 +197,7 @@ func TestBuildPipeline_Run(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			reportCounter = 0
 			pipeline := &pipeline.BuildPipeline{

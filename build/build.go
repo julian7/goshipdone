@@ -2,8 +2,9 @@
 package main
 
 import (
-	"github.com/julian7/goshipdone"
 	"log"
+
+	"github.com/julian7/goshipdone"
 )
 
 func main() {

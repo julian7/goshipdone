@@ -2,6 +2,7 @@ package modules
 
 import (
 	"fmt"
+	"hash"
 	"io"
 	"log"
 	"os"
@@ -28,6 +29,7 @@ type Checksum struct {
 	Skip []string
 }
 
+// nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "archive",
@@ -66,26 +68,12 @@ func (checksum *Checksum) Run(context *ctx.Context) error {
 
 	for osarch := range artifactMap {
 		for _, artifact := range *artifactMap[osarch] {
-			hasher.Reset()
-
-			f, err := os.Open(artifact.Location)
+			sum, err := checksumArtifact(hasher, artifact)
 			if err != nil {
-				return fmt.Errorf("checksumming %s: %w", artifact.Location, err)
+				return err
 			}
 
-			if _, err := io.Copy(hasher, f); err != nil {
-				return fmt.Errorf("reading %s for checksumming: %w", artifact.Location, err)
-			}
-
-			if err := f.Close(); err != nil {
-				return fmt.Errorf("closing %s after checksumming: %w", artifact.Location, err)
-			}
-
-			checksums = append(checksums, fmt.Sprintf(
-				"%x  %s",
-				hasher.Sum(nil),
-				artifact.Filename,
-			))
+			checksums = append(checksums, sum)
 		}
 	}
 
@@ -111,6 +99,29 @@ func (checksum *Checksum) Run(context *ctx.Context) error {
 	log.Printf("checksum file %s written", checksumFilename)
 
 	return nil
+}
+
+func checksumArtifact(hasher hash.Hash, artifact *ctx.Artifact) (string, error) {
+	hasher.Reset()
+
+	f, err := os.Open(artifact.Location)
+	if err != nil {
+		return "", fmt.Errorf("checksumming %s: %w", artifact.Location, err)
+	}
+
+	if _, err := io.Copy(hasher, f); err != nil {
+		return "", fmt.Errorf("reading %s for checksumming: %w", artifact.Location, err)
+	}
+
+	if err := f.Close(); err != nil {
+		return "", fmt.Errorf("closing %s after checksumming: %w", artifact.Location, err)
+	}
+
+	return fmt.Sprintf(
+		"%x  %s",
+		hasher.Sum(nil),
+		artifact.Filename,
+	), nil
 }
 
 func (checksum *Checksum) parseOutput(context *ctx.Context) (string, error) {

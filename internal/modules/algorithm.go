@@ -1,7 +1,9 @@
 package modules
 
 import (
+	//nolint: gosec
 	"crypto/md5"
+	//nolint: gosec
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
@@ -18,9 +20,9 @@ type (
 	}
 )
 
-func (h *HashAlgorithm) UnmarshalYAML(node *yaml.Node) error {
+func (algo *HashAlgorithm) UnmarshalYAML(node *yaml.Node) error {
 	if node.Kind != yaml.ScalarNode {
-		return fmt.Errorf("algorithm is `%v`, not a scalar!", node.Kind)
+		return fmt.Errorf("algorithm is `%v`, not a scalar", node.Kind)
 	}
 
 	var hasherString string
@@ -28,12 +30,12 @@ func (h *HashAlgorithm) UnmarshalYAML(node *yaml.Node) error {
 		return fmt.Errorf("algorithm cannot be decoded: %w", err)
 	}
 
-	algo, err := NewHashAlgorithm(hasherString)
+	newAlgo, err := NewHashAlgorithm(hasherString)
 	if err != nil {
 		return err
 	}
 
-	*h = *algo
+	*algo = *newAlgo
 
 	return nil
 }

@@ -31,13 +31,17 @@ func (Show) Run(context *ctx.Context) error {
 	for key := range context.Env {
 		envKeys = append(envKeys, key)
 	}
+
 	sort.Strings(envKeys)
 
 	log.Printf("Environment:")
+
 	for _, env := range envKeys {
 		log.Printf("- %s = %q", env, context.Env[env])
 	}
+
 	log.Printf("Artifacts:")
+
 	for _, art := range context.Artifacts {
 		log.Printf("- %s: %s (%s)", art.ID, art.Filename, art.OsArch())
 	}

@@ -207,6 +207,7 @@ func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (module
 
 func (tar *goSingleTarget) Run(context *ctx.Context) error {
 	output := path.Join(tar.OutDir, tar.Output)
+
 	err := sh.RunWith(tar.Env, mg.GoCmd(), "build", "-o", output, "-ldflags", tar.LDFlags, tar.Main)
 	if err != nil {
 		_ = sh.Rm(output)

@@ -32,6 +32,7 @@ type CutChangelog struct {
 	Output string
 }
 
+// nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "archive",
@@ -84,6 +85,7 @@ func (mod *CutChangelog) Run(context *ctx.Context) error {
 	if outfile == "" {
 		outfile = mod.Input
 	}
+
 	outfile = path.Join(context.TargetDir, outfile)
 
 	if err := ioutil.WriteFile(outfile, matches[1], 0o644); err != nil {

@@ -18,6 +18,7 @@ const (
 // Env module sets up context's Env hash
 type Env struct{}
 
+// nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "setup",
@@ -36,6 +37,7 @@ func (*Env) Run(context *ctx.Context) error {
 		if len(data) != 2 {
 			continue
 		}
+
 		context.Env.Set(data[0], data[1])
 	}
 
@@ -47,9 +49,11 @@ func (*Env) Run(context *ctx.Context) error {
 					home,
 					".config",
 				))
+
 				break
 			}
 		}
 	}
+
 	return nil
 }
