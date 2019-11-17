@@ -3,6 +3,7 @@ module github.com/julian7/goshipdone
 go 1.13
 
 require (
+	github.com/blang/semver v3.5.1+incompatible
 	github.com/go-test/deep v1.0.4
 	github.com/google/go-github/v28 v28.1.1
 	github.com/magefile/mage v1.9.0

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+Added:
+
+- prerelease detection
+
 Fixed:
 
 - save tag name for future use

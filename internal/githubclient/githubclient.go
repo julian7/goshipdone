@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/blang/semver"
 	"github.com/google/go-github/v28/github"
 	"golang.org/x/oauth2"
 )
@@ -96,7 +97,7 @@ func (rel *Release) Release(name, notes string) error {
 		rel.Conn.Context,
 		rel.Conn.Owner,
 		rel.Conn.Name,
-		rel.Ver,
+		data.GetTagName(),
 	)
 	if err != nil {
 		var resp *github.Response
@@ -135,12 +136,23 @@ func (rel *Release) Release(name, notes string) error {
 }
 
 func (rel *Release) getReleaseData(name, notes string) *github.RepositoryRelease {
+	var prerelease bool
+
+	tag := rel.Tag
+	if tag == "" {
+		tag = rel.Ver
+	}
+
+	if ver, err := semver.Parse(tag); err == nil {
+		prerelease = len(ver.Pre) > 0
+	}
+
 	return &github.RepositoryRelease{
 		Name:       github.String(name),
-		TagName:    github.String(rel.Ver),
+		TagName:    github.String(tag),
 		Body:       github.String(notes),
-		Draft:      github.Bool(true),
-		Prerelease: github.Bool(true),
+		Draft:      github.Bool(rel.Tag == ""),
+		Prerelease: github.Bool(prerelease),
 	}
 }
 
