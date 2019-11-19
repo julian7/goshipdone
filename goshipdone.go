@@ -4,17 +4,33 @@ package goshipdone
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/julian7/goshipdone/pipeline"
+	"github.com/spf13/afero"
 )
 
-func Run(filename string) error {
-	if filename == "" {
-		filename = ".goshipdone.yml"
-	}
+const (
+	filenameEnv          = "GOSHIPDONE_CONFIG"
+	defaultFilename      = ".goshipdone.yml"
+	defaultLocalFilename = ".goshipdone.local.yml"
+)
 
-	content, err := ioutil.ReadFile(filename)
+// nolint: gochecknoglobals
+var defaultFS = afero.NewOsFs()
+
+// Run executes all steps in the pipeline, defined by YAML configuration file.
+// It tries to load files from the following sources:
+// - provided filename
+// - GOSHIPDONE_CONFIG environment variable
+// - .goshipdone.local.yml (if exists)
+// - .goshipdone.yml
+//
+// It returns an error if any of the subsequent processing has an error.
+func Run(filename string) error {
+	filename = detectFilename(filename)
+
+	content, err := afero.ReadFile(defaultFS, filename)
 	if err != nil {
 		return fmt.Errorf("loading GoShipDone file: %w", err)
 	}
@@ -29,4 +45,20 @@ func Run(filename string) error {
 	}
 
 	return nil
+}
+
+func detectFilename(filename string) string {
+	if filename != "" {
+		return filename
+	}
+
+	if fn, ok := os.LookupEnv(filenameEnv); ok {
+		return fn
+	}
+
+	if st, err := defaultFS.Stat(defaultLocalFilename); err == nil && st.Mode().IsRegular() {
+		return defaultLocalFilename
+	}
+
+	return defaultFilename
 }
