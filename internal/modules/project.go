@@ -39,9 +39,9 @@ func NewProject() modules.Pluggable {
 }
 
 // Run records project's basic information into ctx.Context
-func (proj *Project) Run(context *ctx.Context) error {
-	context.ProjectName = proj.Name
-	context.TargetDir = proj.TargetDir
+func (mod *Project) Run(context *ctx.Context) error {
+	context.ProjectName = mod.Name
+	context.TargetDir = mod.TargetDir
 
 	return nil
 }
