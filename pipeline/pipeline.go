@@ -18,7 +18,6 @@ import (
 type BuildPipeline struct {
 	Setups    *modules.Modules `yaml:",omitempty"`
 	Builds    *modules.Modules `yaml:",omitempty"`
-	Archives  *modules.Modules `yaml:",omitempty"`
 	Publishes *modules.Modules `yaml:",omitempty"`
 }
 
@@ -29,7 +28,6 @@ func LoadBuildPipeline(ymlcontent []byte) (*BuildPipeline, error) {
 	pipeline := &BuildPipeline{
 		Setups:    modules.NewModules("setup"),
 		Builds:    modules.NewModules("build"),
-		Archives:  modules.NewModules("archive"),
 		Publishes: modules.NewModules("publish"),
 	}
 
@@ -52,10 +50,9 @@ func LoadBuildPipeline(ymlcontent []byte) (*BuildPipeline, error) {
 // String returns a string representation of the build pipeline
 func (pipeline *BuildPipeline) String() string {
 	return fmt.Sprintf(
-		"{Setups:%v Builds:%v Archives:%v Publishes:%v}",
+		"{Setups:%v Builds:%v Publishes:%v}",
 		pipeline.Setups,
 		pipeline.Builds,
-		pipeline.Archives,
 		pipeline.Publishes,
 	)
 }
@@ -66,7 +63,6 @@ func (pipeline *BuildPipeline) Run() error {
 	steps := []*modules.Modules{
 		pipeline.Setups,
 		pipeline.Builds,
-		pipeline.Archives,
 		pipeline.Publishes,
 	}
 	ctx := ctx.New()

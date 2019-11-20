@@ -48,7 +48,7 @@ type (
 // nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "archive",
+		Stage:   "build",
 		Type:    "tar",
 		Factory: NewTar,
 	})
@@ -125,32 +125,32 @@ type tarSingleTarget struct {
 	Targets     *ctx.Artifacts
 }
 
-func (archive *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts) (*tarSingleTarget, error) {
+func (mod *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts) (*tarSingleTarget, error) {
 	ret := &tarSingleTarget{
 		Arch:        (*artifacts)[0].Arch,
-		Compression: archive.Compression,
+		Compression: mod.Compression,
 		DirsWritten: map[string]bool{},
-		Files:       make([]string, len(archive.Files)),
-		ID:          archive.ID,
+		Files:       make([]string, len(mod.Files)),
+		ID:          mod.ID,
 		OS:          (*artifacts)[0].OS,
 		Targets:     artifacts,
 	}
-	for i := range archive.Files {
-		ret.Files[i] = archive.Files[i]
+	for i := range mod.Files {
+		ret.Files[i] = mod.Files[i]
 	}
 
 	td := modules.NewTemplate(context)
 	td.Arch = ret.Arch
 	td.OS = ret.OS
-	td.Ext = archive.Compression.Extension()
+	td.Ext = mod.Compression.Extension()
 
 	for _, task := range []struct {
 		name   string
 		source string
 		target *string
 	}{
-		{"commondir", archive.CommonDir, &ret.CommonDir},
-		{"output", archive.Output, &ret.Output},
+		{"commondir", mod.CommonDir, &ret.CommonDir},
+		{"output", mod.Output, &ret.Output},
 	} {
 		var err error
 

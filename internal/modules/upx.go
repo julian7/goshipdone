@@ -21,7 +21,7 @@ type UPX struct {
 //nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "archive",
+		Stage:   "build",
 		Type:    "upx",
 		Factory: NewUPX,
 	})

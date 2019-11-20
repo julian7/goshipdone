@@ -35,7 +35,7 @@ type CutChangelog struct {
 // nolint: gochecknoinits
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "archive",
+		Stage:   "build",
 		Type:    "changelog",
 		Factory: NewCutChangelog,
 	})

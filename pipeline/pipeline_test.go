@@ -42,7 +42,7 @@ func (mod *testFailingModuleRegistration) Run(*ctx.Context) error {
 // nolint: funlen
 func TestLoadBuildPipeline(t *testing.T) {
 	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "archive",
+		Stage:   "build",
 		Type:    "test",
 		Factory: testModuleRegistrationFactory,
 	})
@@ -67,14 +67,13 @@ func TestLoadBuildPipeline(t *testing.T) {
 					},
 				},
 				Builds:    &modules.Modules{Stage: "build"},
-				Archives:  &modules.Modules{Stage: "archive"},
 				Publishes: &modules.Modules{Stage: "publish"},
 			},
 			false,
 		},
 		{
 			"invoked mod loads",
-			[]byte("---\narchives:\n  - type: test\n"),
+			[]byte("---\nbuilds:\n  - type: test\n"),
 			&pipeline.BuildPipeline{
 				Setups: &modules.Modules{
 					Stage: "setup",
@@ -85,8 +84,7 @@ func TestLoadBuildPipeline(t *testing.T) {
 						{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
 					},
 				},
-				Builds: &modules.Modules{Stage: "build"},
-				Archives: &modules.Modules{Stage: "archive", Modules: []modules.Module{
+				Builds: &modules.Modules{Stage: "build", Modules: []modules.Module{
 					{Type: "test", Pluggable: testModuleRegistrationFactory()},
 				}},
 				Publishes: &modules.Modules{Stage: "publish"},
@@ -122,7 +120,7 @@ func TestBuildPipeline_Run(t *testing.T) {
 		reportCounterLock.Unlock()
 	}
 
-	for _, stage := range []string{"setup", "build", "archive", "publish"} {
+	for _, stage := range []string{"setup", "build", "publish"} {
 		modules.RegisterModule(&modules.ModuleRegistration{
 			Stage: stage,
 			Type:  "success",
@@ -163,7 +161,6 @@ func TestBuildPipeline_Run(t *testing.T) {
 		name       string
 		Setups     modules.Modules
 		Builds     modules.Modules
-		Archives   modules.Modules
 		Publishes  modules.Modules
 		wantReport int
 		wantErr    bool
@@ -172,7 +169,6 @@ func TestBuildPipeline_Run(t *testing.T) {
 			name:       "empty",
 			Setups:     buildModule("setup"),
 			Builds:     buildModule("build"),
-			Archives:   buildModule("archive"),
 			Publishes:  buildModule("publish"),
 			wantReport: 0,
 			wantErr:    false,
@@ -181,18 +177,16 @@ func TestBuildPipeline_Run(t *testing.T) {
 			name:       "success",
 			Setups:     buildModule("setup", "success"),
 			Builds:     buildModule("build", "success"),
-			Archives:   buildModule("archive", "success"),
 			Publishes:  buildModule("publish", "success"),
-			wantReport: 4,
+			wantReport: 3,
 			wantErr:    false,
 		},
 		{
 			name:       "has error",
 			Setups:     buildModule("setup", "success"),
-			Builds:     buildModule("build", "success"),
-			Archives:   buildModule("archive", "failure"),
+			Builds:     buildModule("build", "failure"),
 			Publishes:  buildModule("publish", "success"),
-			wantReport: 2,
+			wantReport: 1,
 			wantErr:    true,
 		},
 	}
@@ -203,7 +197,6 @@ func TestBuildPipeline_Run(t *testing.T) {
 			pipeline := &pipeline.BuildPipeline{
 				Setups:    &tt.Setups,
 				Builds:    &tt.Builds,
-				Archives:  &tt.Archives,
 				Publishes: &tt.Publishes,
 			}
 			err := pipeline.Run()

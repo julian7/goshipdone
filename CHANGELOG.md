@@ -11,6 +11,10 @@ Added:
 
 - search for alternative build file, closes [#1](https://github.com/julian7/goshipdone/issues/1)
 
+Changed:
+
+- move archive:* modules into build: stage, closes [#2](https://github.com/julian7/goshipdone/issues/2)
+
 ## [v0.3.0] - 2019-11-17
 
 Added:

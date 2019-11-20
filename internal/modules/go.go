@@ -157,7 +157,7 @@ func (build *Go) targets(context *ctx.Context) ([]modules.Pluggable, error) {
 	return targets, nil
 }
 
-func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.Pluggable, error) {
+func (mod *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.Pluggable, error) {
 	td := modules.NewTemplate(context)
 	td.Arch = goarch
 	td.OS = goos
@@ -169,8 +169,8 @@ func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (module
 	tar := &goSingleTarget{
 		Arch: goarch,
 		Env:  ctx.NewEnv(),
-		ID:   build.ID,
-		Main: build.Main,
+		ID:   mod.ID,
+		Main: mod.Main,
 		OS:   goos,
 	}
 
@@ -188,11 +188,11 @@ func (build *Go) singleTarget(context *ctx.Context, goos, goarch string) (module
 		source string
 		target *string
 	}{
-		{"ldflags", build.LDFlags, &tar.LDFlags},
+		{"ldflags", mod.LDFlags, &tar.LDFlags},
 		{"location", path.Join(
 			context.TargetDir,
 			"{{.ProjectName}}-{{.OS}}-{{.Arch}}"), &tar.OutDir},
-		{"output", build.Output, &tar.Output},
+		{"output", mod.Output, &tar.Output},
 	}
 
 	for _, item := range tasks {

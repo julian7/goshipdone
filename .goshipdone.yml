@@ -19,7 +19,6 @@ builds:
       - go mod tidy
       - go test ./...
       - go generate ./...
-archives:
   - type: show
   - type: changelog
     id: changelog

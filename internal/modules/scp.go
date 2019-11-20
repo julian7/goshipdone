@@ -38,8 +38,8 @@ func NewSCP() modules.Pluggable {
 }
 
 // Run takes specified artifacts, and uploads them to a SSH server
-func (scp *SCP) Run(context *ctx.Context) error {
-	builds := context.Artifacts.OsArchByIDs(scp.Builds, scp.Skip)
+func (mod *SCP) Run(context *ctx.Context) error {
+	builds := context.Artifacts.OsArchByIDs(mod.Builds, mod.Skip)
 
 	cmdArgs := []string{}
 
@@ -49,7 +49,7 @@ func (scp *SCP) Run(context *ctx.Context) error {
 		}
 	}
 
-	cmdArgs = append(cmdArgs, scp.Target)
+	cmdArgs = append(cmdArgs, mod.Target)
 
 	return sh.RunV("scp", cmdArgs...)
 }

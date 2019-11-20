@@ -27,7 +27,7 @@ func NewGit() modules.Pluggable {
 }
 
 // Run records git tag information into ctx.Context
-func (setup *Git) Run(context *ctx.Context) error {
+func (*Git) Run(context *ctx.Context) error {
 	items := []struct {
 		name     string
 		required bool
