@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Added:
 
-- search for alternative build file
+- search for alternative build file, closes [#1](https://github.com/julian7/goshipdone/issues/1)
 
 ## [v0.3.0] - 2019-11-17
 
