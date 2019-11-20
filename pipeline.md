@@ -4,6 +4,8 @@ setup:
 
 - [x] project settings
 - [x] git tag detection
+- [x] environment variables
+- [x] skip publish
 
 build:
 
@@ -14,6 +16,7 @@ build:
 - [ ] gzip
 - [x] tar
 - [ ] zip
+- [x] cut changelog (to create release notes for tag)
 - [ ] git-chglog
 - [ ] script
 - [ ] go run
@@ -25,6 +28,6 @@ publish:
 - [ ] S3
 - [x] SCP
 - [ ] HTTP PUT
-- [ ] GitHub Releases API
+- [x] GitHub Releases API
 - [ ] GitLab Releases API
 - [ ] Artifactory

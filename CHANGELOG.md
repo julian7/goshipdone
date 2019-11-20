@@ -13,7 +13,7 @@ Added:
 
 Changed:
 
-- move archive:* modules into build: stage
+- move archive:* modules into build: stage, closes [#2](https://github.com/julian7/goshipdone/issues/2)
 
 ## [v0.3.0] - 2019-11-17
 
