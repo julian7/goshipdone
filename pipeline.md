@@ -10,9 +10,6 @@ build:
 - [x] go
 - [ ] go run
 - [ ] script
-
-archive:
-
 - [x] upx
 - [ ] gzip
 - [x] tar

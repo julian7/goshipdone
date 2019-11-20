@@ -76,7 +76,7 @@ func (mod *Modules) UnmarshalYAML(node *yaml.Node) error {
 // specific module registration exists.
 //
 // Eg. if there are two different modules registered for "*:dump" and
-// "build:dump", a reference to "dump" kind in archives will fire "*:dump"
+// "build:dump", a reference to "dump" kind in publishes will fire "*:dump"
 // module, but a similar "dump" kind in builds will fire "build:dump".
 func (mod *Modules) Add(itemType string, node *yaml.Node, once bool) error {
 	var kind string
