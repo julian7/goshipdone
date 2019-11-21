@@ -14,28 +14,37 @@ import (
 	"os"
 	"strings"
 
+	"github.com/julian7/goshipdone/ctx"
 	"github.com/xanzy/go-gitlab"
 )
 
-type (
-	GitLabClient struct {
-		*gitlab.Client
-		context.Context
-		Namespace string
-		Name      string
-	}
+type GitLabService struct{}
 
-	GitLabRelease struct {
-		Base string
-		Conn *GitLabClient
-		ID   string
-		Ref  string
-		Tag  string
-		Ver  string
-	}
-)
+type GitLabClient struct {
+	*gitlab.Client
+	context.Context
+	Namespace string
+	Name      string
+}
 
-func NewGitLabClient(ctx context.Context, url, token, namespace, name string, options *tls.Config) (*GitLabClient, error) {
+type GitLabRelease struct {
+	Base string
+	Conn *GitLabClient
+	ID   string
+	Ref  string
+	Tag  string
+	Ver  string
+}
+
+func (*GitLabService) DefaultTokenEnv() string {
+	return "GITLAB_TOKEN"
+}
+
+func (*GitLabService) DefaultTokenFile() string {
+	return "$XDG_CONFIG_HOME/goshipdone/gitlab_token"
+}
+
+func (*GitLabService) New(ctx context.Context, url, token, namespace, name string, options *tls.Config) (Connection, error) {
 	client := &GitLabClient{Context: ctx, Name: name, Namespace: namespace}
 	client.connection(ctx, token, options)
 
@@ -47,7 +56,7 @@ func NewGitLabClient(ctx context.Context, url, token, namespace, name string, op
 	return client, nil
 }
 
-func (c *GitLabClient) NewReleaser(tag, ref, version string) (*GitLabRelease, error) {
+func (c *GitLabClient) NewReleaser(tag, ref, version string) (Releaser, error) {
 	proj, _, err := c.Projects.GetProject(c.ProjectPath(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("getting project info: %w", err)
@@ -170,14 +179,14 @@ func (rel *GitLabRelease) uploadFile(filename, location string) (*gitlab.Project
 	return projFile, nil
 }
 
-func (rel *GitLabRelease) Upload(filename, location string) error {
+func (rel *GitLabRelease) Upload(art *ctx.Artifact) error {
 	if rel.ID == "" {
 		return errors.New("no release selected")
 	}
 
 	projectFile, err := rel.uploadFile(
-		filename,
-		location,
+		art.Filename,
+		art.Location,
 	)
 	if err != nil {
 		return err
@@ -188,12 +197,12 @@ func (rel *GitLabRelease) Upload(filename, location string) error {
 		rel.Conn.ProjectPath(),
 		rel.ID,
 		&gitlab.CreateReleaseLinkOptions{
-			Name: &filename,
+			Name: &art.Filename,
 			URL:  &fileURL,
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("uploading file %s into %v: %w", location, rel, err)
+		return fmt.Errorf("uploading file %s into %v: %w", art.Location, rel, err)
 	}
 
 	_ = relLink
