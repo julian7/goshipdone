@@ -85,10 +85,15 @@ func (mod *GitHub) Run(context *ctx.Context) error {
 		return errors.New("multiple release notes found")
 	}
 
-	client, err := artifacts.NewGitHubClient(
+	storage, err := artifacts.New("github")
+	if err != nil {
+		return err
+	}
+
+	client, err := storage.New(
 		context.Context,
 		mod.URL,
-		mod.getToken(context),
+		storage.GetToken(context, mod.TokenEnv, mod.TokenFile),
 		mod.Owner,
 		mod.Name,
 		mod.getTLSConfig(),
@@ -104,14 +109,18 @@ func (mod *GitHub) Run(context *ctx.Context) error {
 		return fmt.Errorf("parsing release name: %w", err)
 	}
 
-	releaser := client.NewReleaser(context.Git.Tag, context.Git.Ref, context.Version)
+	releaser, err := client.NewReleaser(context.Git.Tag, context.Git.Ref, context.Version)
+	if err != nil {
+		return fmt.Errorf("setting up releaser: %w", err)
+	}
+
 	if err := releaser.Release(name, notes); err != nil {
 		return fmt.Errorf("releasing: %w", err)
 	}
 
 	for _, build := range context.Artifacts.OsArchByIDs(mod.Builds, nil) {
 		for _, item := range *build {
-			if err := releaser.Upload(item.Filename, item.Location); err != nil {
+			if err := releaser.Upload(item); err != nil {
 				return fmt.Errorf("uploading file %s to release %v: %w", item.Location, releaser, err)
 			}
 		}

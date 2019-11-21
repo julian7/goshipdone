@@ -12,43 +12,30 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/google/go-github/v28/github"
+	"github.com/julian7/goshipdone/ctx"
 	"golang.org/x/oauth2"
 )
 
-type (
-	GitHubClient struct {
-		*github.Client
-		context.Context
-		Owner string
-		Name  string
-	}
+type GitHubService struct{}
 
-	GitHubRelease struct {
-		Conn *GitHubClient
-		ID   int64
-		Tag  string
-		Ref  string
-		Ver  string
-	}
-)
-
-func NewGitHubClient(ctx context.Context, url, token, owner, name string, options *tls.Config) (*GitHubClient, error) {
-	client := &GitHubClient{Context: ctx, Name: name, Owner: owner}
-	client.connection(ctx, token, options)
-
-	return client, client.setURLs(url)
+type GitHubRelease struct {
+	Conn *GitHubClient
+	ID   int64
+	Tag  string
+	Ref  string
+	Ver  string
 }
 
-func (c *GitHubClient) NewReleaser(tag, ref, version string) *GitHubRelease {
-	return &GitHubRelease{
-		Conn: c,
-		Tag:  tag,
-		Ref:  ref,
-		Ver:  version,
-	}
+func (*GitHubService) DefaultTokenEnv() string {
+	return "GITHUB_TOKEN"
 }
 
-func (c *GitHubClient) connection(ctx context.Context, token string, options *tls.Config) {
+func (*GitHubService) DefaultTokenFile() string {
+	return "$XDG_CONFIG_HOME/goshipdone/github_token"
+}
+
+func (*GitHubService) New(ctx context.Context, url, token, owner, name string, options *tls.Config) (Connection, error) {
+	conn := &GitHubClient{Context: ctx, Name: name, Owner: owner}
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 
 	if options != nil {
@@ -61,7 +48,25 @@ func (c *GitHubClient) connection(ctx context.Context, token string, options *tl
 		)
 	}
 
-	c.Client = github.NewClient(oauth2.NewClient(ctx, ts))
+	conn.Client = github.NewClient(oauth2.NewClient(ctx, ts))
+
+	return conn, conn.setURLs(url)
+}
+
+type GitHubClient struct {
+	*github.Client
+	context.Context
+	Owner string
+	Name  string
+}
+
+func (c *GitHubClient) NewReleaser(tag, ref, version string) (Releaser, error) {
+	return &GitHubRelease{
+		Conn: c,
+		Tag:  tag,
+		Ref:  ref,
+		Ver:  version,
+	}, nil
 }
 
 func (c *GitHubClient) setURLs(baseURL string) error {
@@ -156,14 +161,14 @@ func (rel *GitHubRelease) getReleaseData(name, notes string) *github.RepositoryR
 	}
 }
 
-func (rel *GitHubRelease) Upload(filename, location string) error {
+func (rel *GitHubRelease) Upload(art *ctx.Artifact) error {
 	if rel.ID == 0 {
 		return errors.New("no release selected")
 	}
 
-	file, err := os.Open(location)
+	file, err := os.Open(art.Location)
 	if err != nil {
-		return fmt.Errorf("opening file %s for uploading: %w", location, err)
+		return fmt.Errorf("opening file %s for uploading: %w", art.Location, err)
 	}
 
 	if _, _, err = rel.Conn.Client.Repositories.UploadReleaseAsset(
@@ -172,11 +177,11 @@ func (rel *GitHubRelease) Upload(filename, location string) error {
 		rel.Conn.Name,
 		rel.ID,
 		&github.UploadOptions{
-			Name: filename,
+			Name: art.Filename,
 		},
 		file,
 	); err != nil {
-		return fmt.Errorf("uploading file %s into %v: %w", location, rel, err)
+		return fmt.Errorf("uploading file %s into %v: %w", art.Location, rel, err)
 	}
 
 	return nil

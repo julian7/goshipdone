@@ -11,16 +11,17 @@ import (
 	"github.com/julian7/goshipdone/modules"
 )
 
-type GitLab struct {
+// Artifact is a publish module for artifact storage servers like GitHub, or GitLab.
+type Artifact struct {
 	// Builds specifies which build names should be uploaded to the
-	// gitlab release.
+	// github release.
 	Builds []string
-	// Name specifies the repository's name. No default, no detectio (yet).
+	// Name specifies the repository's name. No default, no detection (yet).
 	// Required.
 	Name string
-	// Namespace specifies the repository's owning group or username. No default,
+	// Owner specifies the repository's owning organization. No default,
 	// no detection (yet). Required.
-	Namespace string
+	Owner string
 	// ReleaseName specifies the release's name, using modules.TemplateData.
 	// Default: "{{.Version}}"
 	ReleaseName string `yaml:"release_name,omitempty"`
@@ -30,15 +31,18 @@ type GitLab struct {
 	// SkipTLSVerify allows connecting to servers with invalid TLS certs.
 	// default: false
 	SkipTLSVerify bool `yaml:"skip_tls_verify"`
+	// Service specifies which artifact service we are using. Default: "github".
+	Storage *artifacts.Storage
 	// TokenEnv specifies which environment variable the module should look
-	// for for GitLab private token. Default: "GITLAB_TOKEN".
+	// for for server token. It is discovered from artifacts.Storage if not set.
+	// Example: GITHUB_TOKEN.
 	TokenEnv string `yaml:"token_env"`
-	// TokenFile specifies which file the module should look for for
-	// GitLab private token. Variable expansion is available. Default:
-	// "$XDG_CONFIG_HOME/goshipdone/gitlab_token".
+	// TokenFile specifies which file the module should look for artifact storage
+	// token. Variable expansion is available. It is discovered
+	// from artifacts.Storage if not set. Example:
+	// "$XDG_CONFIG_HOME/goshipdone/github_token".
 	TokenFile string `yaml:"token_file"`
-	// URL base URL for gitlab. Provide this only for on-premise GitLab.
-	// default: ""
+	// URL base URL for the artifact storage. Provide this only for on-premises services.
 	URL string
 }
 
@@ -46,22 +50,25 @@ type GitLab struct {
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "publish",
-		Type:    "gitlab",
-		Factory: NewGitLab,
+		Type:    "artifact",
+		Factory: NewArtifact,
 	})
 }
 
-func NewGitLab() modules.Pluggable {
-	return &GitLab{
+// NewArtifact is a factory method for Artifact module
+func NewArtifact() modules.Pluggable {
+	storage, _ := artifacts.New("github")
+
+	return &Artifact{
 		ReleaseName:   "{{.Version}}",
 		SkipTLSVerify: false,
-		TokenEnv:      "GITLAB_TOKEN",
-		TokenFile:     "$XDG_CONFIG_HOME/goshipdone/gitlab_token",
-		URL:           "",
+		Storage:       storage,
 	}
 }
 
-func (mod *GitLab) Run(context *ctx.Context) error {
+// Run uploads previously created artifact into artifact storage provided
+// by artifacts.Storage.
+func (mod *Artifact) Run(context *ctx.Context) error {
 	var notes string
 
 	relNotes := []*ctx.Artifact(*context.Artifacts.ByID(mod.ReleaseNotes))
@@ -80,16 +87,11 @@ func (mod *GitLab) Run(context *ctx.Context) error {
 		return errors.New("multiple release notes found")
 	}
 
-	storage, err := artifacts.New("gitlab")
-	if err != nil {
-		return err
-	}
-
-	client, err := storage.New(
+	client, err := mod.Storage.New(
 		context.Context,
 		mod.URL,
-		storage.GetToken(context, mod.TokenEnv, mod.TokenFile),
-		mod.Namespace,
+		mod.Storage.GetToken(context, mod.TokenEnv, mod.TokenFile),
+		mod.Owner,
 		mod.Name,
 		mod.getTLSConfig(),
 	)
@@ -124,7 +126,7 @@ func (mod *GitLab) Run(context *ctx.Context) error {
 	return nil
 }
 
-func (mod *GitLab) getTLSConfig() *tls.Config {
+func (mod *Artifact) getTLSConfig() *tls.Config {
 	return &tls.Config{
 		// nolint: gosec
 		InsecureSkipVerify: mod.SkipTLSVerify,
