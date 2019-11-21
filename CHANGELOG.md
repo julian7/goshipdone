@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Added:
 
+- gitlab support, closes [#4](https://github.com/julian7/goshipdone/issues/4)
 - search for alternative build file, closes [#1](https://github.com/julian7/goshipdone/issues/1)
 
 Changed:

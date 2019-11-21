@@ -8,6 +8,7 @@ require (
 	github.com/google/go-github/v28 v28.1.1
 	github.com/magefile/mage v1.9.0
 	github.com/spf13/afero v1.2.2
-	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
+	github.com/xanzy/go-gitlab v0.22.1
+	golang.org/x/oauth2 v0.0.0-20181106182150-f42d05182288
 	gopkg.in/yaml.v3 v3.0.0-20191106092431-e228e37189d3
 )

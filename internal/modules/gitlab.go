@@ -14,16 +14,16 @@ import (
 	"github.com/julian7/goshipdone/modules"
 )
 
-type GitHub struct {
+type GitLab struct {
 	// Builds specifies which build names should be uploaded to the
-	// github release.
+	// gitlab release.
 	Builds []string
 	// Name specifies the repository's name. No default, no detectio (yet).
 	// Required.
 	Name string
-	// Owner specifies the repository's owning organization. No default,
+	// Namespace specifies the repository's owning group or username. No default,
 	// no detection (yet). Required.
-	Owner string
+	Namespace string
 	// ReleaseName specifies the release's name, using modules.TemplateData.
 	// Default: "{{.Version}}"
 	ReleaseName string `yaml:"release_name,omitempty"`
@@ -34,16 +34,14 @@ type GitHub struct {
 	// default: false
 	SkipTLSVerify bool `yaml:"skip_tls_verify"`
 	// TokenEnv specifies which environment variable the module should look
-	// for for GitHub OAuth2 token. Default: "GITHUB_TOKEN".
+	// for for GitLab private token. Default: "GITLAB_TOKEN".
 	TokenEnv string `yaml:"token_env"`
 	// TokenFile specifies which file the module should look for for
-	// GitHub OAuth2 token. Variable expansion is available. Default:
-	// "$XDG_CONFIG_HOME/goshipdone/github_token".
+	// GitLab private token. Variable expansion is available. Default:
+	// "$XDG_CONFIG_HOME/goshipdone/gitlab_token".
 	TokenFile string `yaml:"token_file"`
-	// URL base URL for github. Provide this only for GitHub Enterprise.
+	// URL base URL for gitlab. Provide this only for on-premise GitLab.
 	// default: ""
-	// API: <URL>/api/v3/
-	// Upload: <URL>/api/uploads/
 	URL string
 }
 
@@ -51,22 +49,22 @@ type GitHub struct {
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "publish",
-		Type:    "github",
-		Factory: NewGitHub,
+		Type:    "gitlab",
+		Factory: NewGitLab,
 	})
 }
 
-func NewGitHub() modules.Pluggable {
-	return &GitHub{
+func NewGitLab() modules.Pluggable {
+	return &GitLab{
 		ReleaseName:   "{{.Version}}",
 		SkipTLSVerify: false,
-		TokenEnv:      "GITHUB_TOKEN",
-		TokenFile:     "$XDG_CONFIG_HOME/goshipdone/github_token",
+		TokenEnv:      "GITLAB_TOKEN",
+		TokenFile:     "$XDG_CONFIG_HOME/goshipdone/gitlab_token",
 		URL:           "",
 	}
 }
 
-func (mod *GitHub) Run(context *ctx.Context) error {
+func (mod *GitLab) Run(context *ctx.Context) error {
 	var notes string
 
 	relNotes := []*ctx.Artifact(*context.Artifacts.ByID(mod.ReleaseNotes))
@@ -85,11 +83,11 @@ func (mod *GitHub) Run(context *ctx.Context) error {
 		return errors.New("multiple release notes found")
 	}
 
-	client, err := artifacts.NewGitHubClient(
+	client, err := artifacts.NewGitLabClient(
 		context.Context,
 		mod.URL,
 		mod.getToken(context),
-		mod.Owner,
+		mod.Namespace,
 		mod.Name,
 		mod.getTLSConfig(),
 	)
@@ -104,7 +102,11 @@ func (mod *GitHub) Run(context *ctx.Context) error {
 		return fmt.Errorf("parsing release name: %w", err)
 	}
 
-	releaser := client.NewReleaser(context.Git.Tag, context.Git.Ref, context.Version)
+	releaser, err := client.NewReleaser(context.Git.Tag, context.Git.Ref, context.Version)
+	if err != nil {
+		return fmt.Errorf("setting up releaser: %w", err)
+	}
+
 	if err := releaser.Release(name, notes); err != nil {
 		return fmt.Errorf("releasing: %w", err)
 	}
@@ -120,7 +122,7 @@ func (mod *GitHub) Run(context *ctx.Context) error {
 	return nil
 }
 
-func (mod *GitHub) getToken(context *ctx.Context) string {
+func (mod *GitLab) getToken(context *ctx.Context) string {
 	if token, ok := context.Env.Get(mod.TokenEnv); ok {
 		return token
 	}
@@ -140,7 +142,7 @@ func (mod *GitHub) getToken(context *ctx.Context) string {
 	return strings.TrimSpace(string(data))
 }
 
-func (mod *GitHub) getTLSConfig() *tls.Config {
+func (mod *GitLab) getTLSConfig() *tls.Config {
 	return &tls.Config{
 		// nolint: gosec
 		InsecureSkipVerify: mod.SkipTLSVerify,

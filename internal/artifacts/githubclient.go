@@ -1,4 +1,4 @@
-package githubclient
+package artifacts
 
 import (
 	"context"
@@ -23,7 +23,7 @@ type (
 		Name  string
 	}
 
-	Release struct {
+	GitHubRelease struct {
 		Conn *GitHubClient
 		ID   int64
 		Tag  string
@@ -32,15 +32,15 @@ type (
 	}
 )
 
-func New(ctx context.Context, url, token, owner, name string, options *tls.Config) (*GitHubClient, error) {
+func NewGitHubClient(ctx context.Context, url, token, owner, name string, options *tls.Config) (*GitHubClient, error) {
 	client := &GitHubClient{Context: ctx, Name: name, Owner: owner}
 	client.connection(ctx, token, options)
 
 	return client, client.setURLs(url)
 }
 
-func (c *GitHubClient) NewReleaser(tag, ref, version string) *Release {
-	return &Release{
+func (c *GitHubClient) NewReleaser(tag, ref, version string) *GitHubRelease {
+	return &GitHubRelease{
 		Conn: c,
 		Tag:  tag,
 		Ref:  ref,
@@ -90,7 +90,7 @@ func (c *GitHubClient) setURLs(baseURL string) error {
 	return nil
 }
 
-func (rel *Release) Release(name, notes string) error {
+func (rel *GitHubRelease) Release(name, notes string) error {
 	data := rel.getReleaseData(name, notes)
 
 	release, _, err := rel.Conn.Client.Repositories.GetReleaseByTag(
@@ -135,7 +135,7 @@ func (rel *Release) Release(name, notes string) error {
 	return nil
 }
 
-func (rel *Release) getReleaseData(name, notes string) *github.RepositoryRelease {
+func (rel *GitHubRelease) getReleaseData(name, notes string) *github.RepositoryRelease {
 	var prerelease bool
 
 	tag := rel.Tag
@@ -156,7 +156,7 @@ func (rel *Release) getReleaseData(name, notes string) *github.RepositoryRelease
 	}
 }
 
-func (rel *Release) Upload(filename, location string) error {
+func (rel *GitHubRelease) Upload(filename, location string) error {
 	if rel.ID == 0 {
 		return errors.New("no release selected")
 	}
@@ -182,6 +182,6 @@ func (rel *Release) Upload(filename, location string) error {
 	return nil
 }
 
-func (rel *Release) String() string {
+func (rel *GitHubRelease) String() string {
 	return fmt.Sprintf("%s/%s #%d", rel.Conn.Owner, rel.Conn.Name, rel.ID)
 }
