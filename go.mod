@@ -6,6 +6,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/go-test/deep v1.0.4
 	github.com/google/go-github/v28 v28.1.1
+	github.com/julian7/withenv v0.1.0
 	github.com/magefile/mage v1.9.0
 	github.com/spf13/afero v1.2.2
 	github.com/xanzy/go-gitlab v0.22.1

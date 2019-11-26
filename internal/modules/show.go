@@ -27,8 +27,8 @@ func NewShow() modules.Pluggable {
 
 // Run provides a list of artifacts recorded so far
 func (Show) Run(context *ctx.Context) error {
-	envKeys := make([]string, 0, len(context.Env))
-	for key := range context.Env {
+	envKeys := make([]string, 0, len(context.Env.Vars))
+	for key := range context.Env.Vars {
 		envKeys = append(envKeys, key)
 	}
 
@@ -37,7 +37,7 @@ func (Show) Run(context *ctx.Context) error {
 	log.Printf("Environment:")
 
 	for _, env := range envKeys {
-		log.Printf("- %s = %q", env, context.Env[env])
+		log.Printf("- %s = %q", env, context.Env.GetOrDefault(env, "-unset-"))
 	}
 
 	log.Printf("Artifacts:")

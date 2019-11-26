@@ -2,13 +2,13 @@ package modules
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
 	"github.com/julian7/goshipdone/ctx"
 	"github.com/julian7/goshipdone/modules"
-	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
+	"github.com/julian7/withenv"
 )
 
 type (
@@ -60,7 +60,7 @@ type (
 
 	goSingleTarget struct {
 		Arch    string
-		Env     ctx.Env
+		Env     *withenv.Env
 		ID      string
 		LDFlags string
 		OutDir  string
@@ -123,7 +123,7 @@ func (build *Go) runHooks(context *ctx.Context, hooks []string) error {
 
 	for _, hook := range hooks {
 		args := strings.Fields(hook)
-		if err := sh.RunWith(context.Env, args[0], args[1:]...); err != nil {
+		if err := context.Env.Run(args[0], args[1:]...); err != nil {
 			return err
 		}
 	}
@@ -168,18 +168,18 @@ func (mod *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.
 
 	tar := &goSingleTarget{
 		Arch: goarch,
-		Env:  ctx.NewEnv(),
+		Env:  withenv.New(),
 		ID:   mod.ID,
 		Main: mod.Main,
 		OS:   goos,
 	}
 
-	for key, val := range context.Env {
+	for key, val := range context.Env.Vars {
 		tar.Env.Set(key, val)
 	}
 
-	tar.Env["GOOS"] = goos
-	tar.Env["GOARCH"] = goarch
+	tar.Env.Set("GOOS", goos)
+	tar.Env.Set("GOARCH", goarch)
 
 	var err error
 
@@ -208,9 +208,9 @@ func (mod *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.
 func (tar *goSingleTarget) Run(context *ctx.Context) error {
 	output := path.Join(tar.OutDir, tar.Output)
 
-	err := sh.RunWith(tar.Env, mg.GoCmd(), "build", "-o", output, "-ldflags", tar.LDFlags, tar.Main)
+	err := tar.Env.Run("go", "build", "-o", output, "-ldflags", tar.LDFlags, tar.Main)
 	if err != nil {
-		_ = sh.Rm(output)
+		_ = os.Remove(output)
 		return err
 	}
 

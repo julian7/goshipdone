@@ -5,6 +5,7 @@ import (
 	"text/template"
 
 	"github.com/julian7/goshipdone/ctx"
+	"github.com/julian7/withenv"
 )
 
 // TemplateData is the data all template-based text replacement takes place.
@@ -19,7 +20,7 @@ type TemplateData struct {
 	// ArchiveName defines a URL where the resource will be remotely available
 	ArchiveName string
 	// Env is a copy of environment variables set in ctx.Context
-	Env *ctx.Env
+	Env *withenv.Env
 	// Git is a copy of git-related info from ctx.Context
 	Git *ctx.GitData
 	// OS defines target operating system
@@ -34,7 +35,7 @@ type TemplateData struct {
 
 func NewTemplate(context *ctx.Context) *TemplateData {
 	return &TemplateData{
-		Env:         &context.Env,
+		Env:         context.Env,
 		Git:         context.Git,
 		ProjectName: context.ProjectName,
 		Version:     context.Version,

@@ -2,14 +2,18 @@
 // in the build pipeline.
 package ctx
 
-import "context"
+import (
+	"context"
+
+	"github.com/julian7/withenv"
+)
 
 // Context are a cumulative structure carried over to each module,
 // to contain data later steps might require
 type Context struct {
 	context.Context
 	Artifacts   Artifacts
-	Env         Env
+	Env         *withenv.Env
 	Git         *GitData
 	ProjectName string
 	Publish     bool
@@ -30,7 +34,7 @@ type GitData struct {
 func New() *Context {
 	return &Context{
 		Context: context.Background(),
-		Env:     NewEnv(),
+		Env:     withenv.New(),
 		Git:     new(GitData),
 	}
 }
