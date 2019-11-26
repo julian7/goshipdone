@@ -81,7 +81,9 @@ func (s *Storage) UnmarshalYAML(node *yaml.Node) error {
 	if err != nil {
 		return err
 	}
+
 	s.Service = service
+
 	return nil
 }
 
@@ -92,6 +94,7 @@ func (s *Storage) Load(name string) (Service, error) {
 	case "gitlab", "GitLab", "Gitlab":
 		return &GitLabService{}, nil
 	}
+
 	return nil, fmt.Errorf("invalid storage: `%s`", name)
 }
 

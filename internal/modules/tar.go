@@ -66,15 +66,15 @@ func NewTar() modules.Pluggable {
 	}
 }
 
-func (archive *Tar) Run(context *ctx.Context) error {
-	builds := context.Artifacts.OsArchByIDs(archive.Builds, archive.Skip)
+func (mod *Tar) Run(context *ctx.Context) error {
+	builds := context.Artifacts.OsArchByIDs(mod.Builds, mod.Skip)
 
 	if err := validateBuilds(builds); err != nil {
 		return err
 	}
 
 	for osarch := range builds {
-		target, err := archive.singleTarget(context, builds[osarch])
+		target, err := mod.singleTarget(context, builds[osarch])
 		if err != nil {
 			return err
 		}

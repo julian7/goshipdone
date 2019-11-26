@@ -32,6 +32,7 @@ func (pip *Pipeline) UnmarshalYAML(node *yaml.Node) error {
 	l := len(node.Content)
 	for i := 0; i < l; i += 2 {
 		var stage *Stage
+
 		stageDefName := node.Content[i].Value
 
 		for _, st := range pip.Stages {
@@ -48,6 +49,7 @@ func (pip *Pipeline) UnmarshalYAML(node *yaml.Node) error {
 			return fmt.Errorf("decoding %s stage: %w", stage.Name, err)
 		}
 	}
+
 	return nil
 }
 

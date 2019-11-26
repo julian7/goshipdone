@@ -92,14 +92,14 @@ func NewGo() modules.Pluggable {
 }
 
 // Run executes a go build step
-func (build *Go) Run(context *ctx.Context) error {
-	targets, err := build.targets(context)
+func (mod *Go) Run(context *ctx.Context) error {
+	targets, err := mod.targets(context)
 
 	if err != nil {
 		return err
 	}
 
-	if err := build.runHooks(context, build.Before); err != nil {
+	if err := mod.runHooks(context, mod.Before); err != nil {
 		return err
 	}
 
@@ -109,14 +109,14 @@ func (build *Go) Run(context *ctx.Context) error {
 		}
 	}
 
-	if err := build.runHooks(context, build.After); err != nil {
+	if err := mod.runHooks(context, mod.After); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (build *Go) runHooks(context *ctx.Context, hooks []string) error {
+func (mod *Go) runHooks(context *ctx.Context, hooks []string) error {
 	if len(hooks) == 0 {
 		return nil
 	}
@@ -131,20 +131,20 @@ func (build *Go) runHooks(context *ctx.Context, hooks []string) error {
 	return nil
 }
 
-func (build *Go) targets(context *ctx.Context) ([]modules.Pluggable, error) {
+func (mod *Go) targets(context *ctx.Context) ([]modules.Pluggable, error) {
 	targets := []modules.Pluggable{}
 
-	for _, goos := range build.GOOS {
+	for _, goos := range mod.GOOS {
 	NextArch:
-		for _, goarch := range build.GOArch {
+		for _, goarch := range mod.GOArch {
 			osarch := fmt.Sprintf("%s-%s", goos, goarch)
-			for _, skip := range build.Skip {
+			for _, skip := range mod.Skip {
 				if osarch == skip {
 					continue NextArch
 				}
 			}
 
-			target, err := build.singleTarget(context, goos, goarch)
+			target, err := mod.singleTarget(context, goos, goarch)
 
 			if err != nil {
 				return nil, err

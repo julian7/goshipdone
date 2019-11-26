@@ -44,7 +44,11 @@ func (*GitLabService) DefaultTokenFile() string {
 	return "$XDG_CONFIG_HOME/goshipdone/gitlab_token"
 }
 
-func (*GitLabService) New(ctx context.Context, url, token, namespace, name string, options *tls.Config) (Connection, error) {
+func (*GitLabService) New(
+	ctx context.Context,
+	url, token, namespace, name string,
+	options *tls.Config,
+) (Connection, error) {
 	client := &GitLabClient{Context: ctx, Name: name, Namespace: namespace}
 	client.connection(ctx, token, options)
 
@@ -53,6 +57,7 @@ func (*GitLabService) New(ctx context.Context, url, token, namespace, name strin
 			return nil, err
 		}
 	}
+
 	return client, nil
 }
 
@@ -79,7 +84,7 @@ func (c *GitLabClient) ProjectID() string {
 	return strings.Replace(url.PathEscape(c.ProjectPath()), ".", "%2E", -1)
 }
 
-func (c *GitLabClient) connection(ctx context.Context, token string, options *tls.Config) {
+func (c *GitLabClient) connection(_ context.Context, token string, options *tls.Config) {
 	httpClient := &http.Client{}
 
 	if options != nil {
@@ -158,6 +163,7 @@ func (rel *GitLabRelease) uploadFile(filename, location string) (*gitlab.Project
 	if err != nil {
 		return nil, fmt.Errorf("loading file %s to upload form: %w", filename, err)
 	}
+
 	_ = w.Close()
 
 	req, err := rel.Conn.NewRequest("", u, nil, nil)
@@ -193,6 +199,7 @@ func (rel *GitLabRelease) Upload(art *ctx.Artifact) error {
 	}
 
 	fileURL := rel.Base + projectFile.URL
+
 	relLink, _, err := rel.Conn.ReleaseLinks.CreateReleaseLink(
 		rel.Conn.ProjectPath(),
 		rel.ID,
@@ -206,6 +213,7 @@ func (rel *GitLabRelease) Upload(art *ctx.Artifact) error {
 	}
 
 	_ = relLink
+
 	return nil
 }
 

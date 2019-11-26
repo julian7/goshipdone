@@ -34,7 +34,11 @@ func (*GitHubService) DefaultTokenFile() string {
 	return "$XDG_CONFIG_HOME/goshipdone/github_token"
 }
 
-func (*GitHubService) New(ctx context.Context, url, token, owner, name string, options *tls.Config) (Connection, error) {
+func (*GitHubService) New(
+	ctx context.Context,
+	url, token, owner, name string,
+	options *tls.Config,
+) (Connection, error) {
 	conn := &GitHubClient{Context: ctx, Name: name, Owner: owner}
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 

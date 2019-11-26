@@ -21,7 +21,9 @@ func TestGitLabClient_ProjectID(t *testing.T) {
 		{name: "ns has a dot", namespace: "ab.c", project: "de.f", want: "ab%2Ec%2Fde%2Ef"},
 		{name: "subgroup", namespace: "a/b/c", project: "def", want: "a%2Fb%2Fc%2Fdef"},
 	}
+
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			c := &GitLabClient{
 				Client:    client,
