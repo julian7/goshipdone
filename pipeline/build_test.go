@@ -50,44 +50,54 @@ func TestLoadBuildPipeline(t *testing.T) {
 	tests := []struct {
 		name       string
 		ymlcontent []byte
-		want       *pipeline.BuildPipeline
+		want       *pipeline.Pipeline
 		wantErr    bool
 	}{
 		{
 			"empty loads defaults",
 			[]byte("---\n"),
-			&pipeline.BuildPipeline{
-				Setups: &modules.Modules{
-					Stage: "setup",
-					Modules: []modules.Module{
-						{Type: "env", Pluggable: intmod.NewEnv()},
-						{Type: "project", Pluggable: intmod.NewProject()},
-						{Type: "git_tag", Pluggable: intmod.NewGit()},
-						{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
+			&pipeline.Pipeline{
+				Stages: []*pipeline.Stage{
+					{
+						Name:   "setup",
+						Plural: "setups",
+						Modules: []*modules.Module{
+							{Type: "env", Pluggable: intmod.NewEnv()},
+							{Type: "project", Pluggable: intmod.NewProject()},
+							{Type: "git_tag", Pluggable: intmod.NewGit()},
+							{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
+						},
 					},
+					{Name: "build", Plural: "builds"},
+					{Name: "publish", Plural: "publishes"},
 				},
-				Builds:    &modules.Modules{Stage: "build"},
-				Publishes: &modules.Modules{Stage: "publish"},
 			},
 			false,
 		},
 		{
 			"invoked mod loads",
 			[]byte("---\nbuilds:\n  - type: test\n"),
-			&pipeline.BuildPipeline{
-				Setups: &modules.Modules{
-					Stage: "setup",
-					Modules: []modules.Module{
-						{Type: "env", Pluggable: intmod.NewEnv()},
-						{Type: "project", Pluggable: intmod.NewProject()},
-						{Type: "git_tag", Pluggable: intmod.NewGit()},
-						{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
+			&pipeline.Pipeline{
+				Stages: []*pipeline.Stage{
+					{
+						Name:   "setup",
+						Plural: "setups",
+						Modules: []*modules.Module{
+							{Type: "env", Pluggable: intmod.NewEnv()},
+							{Type: "project", Pluggable: intmod.NewProject()},
+							{Type: "git_tag", Pluggable: intmod.NewGit()},
+							{Type: "skip_publish", Pluggable: intmod.NewSkipPublish()},
+						},
 					},
+					{
+						Name:   "build",
+						Plural: "builds",
+						Modules: []*modules.Module{
+							{Type: "test", Pluggable: testModuleRegistrationFactory()},
+						},
+					},
+					{Name: "publish", Plural: "publishes"},
 				},
-				Builds: &modules.Modules{Stage: "build", Modules: []modules.Module{
-					{Type: "test", Pluggable: testModuleRegistrationFactory()},
-				}},
-				Publishes: &modules.Modules{Stage: "publish"},
 			},
 			false,
 		},
@@ -135,57 +145,67 @@ func TestBuildPipeline_Run(t *testing.T) {
 		})
 	}
 
-	buildModule := func(stage string, types ...string) modules.Modules {
-		mods := modules.Modules{Stage: stage}
+	buildStage := func(name, plural string, types ...string) *pipeline.Stage {
+		stg := pipeline.NewStage(name, plural)
 
 		if len(types) > 0 {
-			mods.Modules = []modules.Module{}
+			stg.Modules = []*modules.Module{}
 
 			for _, modType := range types {
 				modFactory, ok := modules.LookupModule(
-					fmt.Sprintf("%s:%s", stage, modType),
+					fmt.Sprintf("%s:%s", name, modType),
 				)
 				if ok {
-					mods.Modules = append(
-						mods.Modules,
-						modules.Module{Type: modType, Pluggable: modFactory()},
+					stg.Modules = append(
+						stg.Modules,
+						&modules.Module{Type: modType, Pluggable: modFactory()},
 					)
 				}
 			}
 		}
 
-		return mods
+		return stg
 	}
 
 	tests := []struct {
 		name       string
-		Setups     modules.Modules
-		Builds     modules.Modules
-		Publishes  modules.Modules
+		Pipeline   *pipeline.Pipeline
 		wantReport int
 		wantErr    bool
 	}{
 		{
-			name:       "empty",
-			Setups:     buildModule("setup"),
-			Builds:     buildModule("build"),
-			Publishes:  buildModule("publish"),
+			name: "empty",
+			Pipeline: &pipeline.Pipeline{
+				Stages: []*pipeline.Stage{
+					buildStage("setup", "setups"),
+					buildStage("build", "builds"),
+					buildStage("publish", "publishes"),
+				},
+			},
 			wantReport: 0,
 			wantErr:    false,
 		},
 		{
-			name:       "success",
-			Setups:     buildModule("setup", "success"),
-			Builds:     buildModule("build", "success"),
-			Publishes:  buildModule("publish", "success"),
+			name: "success",
+			Pipeline: &pipeline.Pipeline{
+				Stages: []*pipeline.Stage{
+					buildStage("setup", "setups", "success"),
+					buildStage("build", "builds", "success"),
+					buildStage("publish", "publishes", "success"),
+				},
+			},
 			wantReport: 3,
 			wantErr:    false,
 		},
 		{
-			name:       "has error",
-			Setups:     buildModule("setup", "success"),
-			Builds:     buildModule("build", "failure"),
-			Publishes:  buildModule("publish", "success"),
+			name: "has error",
+			Pipeline: &pipeline.Pipeline{
+				Stages: []*pipeline.Stage{
+					buildStage("setup", "setups", "success"),
+					buildStage("build", "builds", "failure"),
+					buildStage("publish", "publishes", "success"),
+				},
+			},
 			wantReport: 1,
 			wantErr:    true,
 		},
@@ -194,12 +214,7 @@ func TestBuildPipeline_Run(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			reportCounter = 0
-			pipeline := &pipeline.BuildPipeline{
-				Setups:    &tt.Setups,
-				Builds:    &tt.Builds,
-				Publishes: &tt.Publishes,
-			}
-			err := pipeline.Run()
+			err := tt.Pipeline.Run()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("BuildPipeline.Run() error = %v, wantErr %v", err, tt.wantErr)
 			}

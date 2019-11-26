@@ -15,6 +15,7 @@ Added:
 
 Changed:
 
+- make pipeline generic, rename modules to stage
 - replace environment handler with withenv
 - move archive:* modules into build: stage, closes [#2](https://github.com/julian7/goshipdone/issues/2)
 
