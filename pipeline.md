@@ -29,5 +29,5 @@ publish:
 - [x] SCP
 - [ ] HTTP PUT
 - [x] GitHub Releases API
-- [ ] GitLab Releases API
+- [x] GitLab Releases API
 - [ ] Artifactory
