@@ -108,34 +108,22 @@ func (stg *Stage) Add(itemType string, node *yaml.Node, once bool) error {
 
 // Run goes through all internally loaded modules, and run them
 // one by one.
-func (mod *Stage) Run(context *ctx.Context) error {
-	log.Printf("====> %s", strings.ToUpper(mod.Name))
+func (stg *Stage) Run(context *ctx.Context) error {
+	log.Printf("====> %s", strings.ToUpper(stg.Name))
 
 	startMod := time.Now()
 
-	if mod.SkipFN != nil && mod.SkipFN(context) {
+	if stg.SkipFN != nil && stg.SkipFN(context) {
 		log.Printf("SKIPPED")
-	} else if err := mod.run(context); err != nil {
-		return err
-	}
-
-	log.Printf("<==== %s done in %s", strings.ToUpper(mod.Name), time.Since(startMod))
-
-	return nil
-}
-
-func (mod *Stage) run(context *ctx.Context) error {
-	for _, module := range mod.Modules {
-		log.Printf("----> %s", module.Type)
-
-		start := time.Now()
-
-		if err := module.Pluggable.Run(context); err != nil {
-			return fmt.Errorf("%s:%s: %w", mod.Name, module.Type, err)
+	} else {
+		for _, module := range stg.Modules {
+			if err := module.Run(context); err != nil {
+				return fmt.Errorf("stage %s: %w", stg.Name, err)
+			}
 		}
-
-		log.Printf("<---- %s done in %s", module.Type, time.Since(start))
 	}
+
+	log.Printf("<==== %s done in %s", strings.ToUpper(stg.Name), time.Since(startMod))
 
 	return nil
 }
