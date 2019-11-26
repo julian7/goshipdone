@@ -24,7 +24,7 @@ There are other goals on the horizon, which are not immediately important:
 
 ## Try it
 
-Running `go run build/build.go` takes example .goshipdone.yml file, and runs it.
+Running `go run build/build.go` takes example .goshipdone.yml file, and runs it. Now it takes an optional argument, `-publish`, which enables publishing stage.
 
 ## Legal
 
