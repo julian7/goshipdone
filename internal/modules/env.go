@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"os"
 	"path"
 
@@ -30,7 +31,12 @@ func NewEnv() modules.Pluggable {
 	return &Env{}
 }
 
-func (*Env) Run(context *ctx.Context) error {
+func (*Env) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	if err := context.Env.Load(os.Environ()); err != nil {
 		return err
 	}

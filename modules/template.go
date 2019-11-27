@@ -2,6 +2,7 @@ package modules
 
 import (
 	"bytes"
+	"context"
 	"text/template"
 
 	"github.com/julian7/goshipdone/ctx"
@@ -33,13 +34,18 @@ type TemplateData struct {
 	Ext string
 }
 
-func NewTemplate(context *ctx.Context) *TemplateData {
+func NewTemplate(cx context.Context) (*TemplateData, error) {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return nil, err
+	}
+
 	return &TemplateData{
 		Env:         context.Env,
 		Git:         context.Git,
 		ProjectName: context.ProjectName,
 		Version:     context.Version,
-	}
+	}, nil
 }
 
 // Parse parses a string based on TemplateData, and returns output in string format

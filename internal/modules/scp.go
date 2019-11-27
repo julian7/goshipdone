@@ -1,6 +1,8 @@
 package modules
 
 import (
+	"context"
+
 	"github.com/julian7/goshipdone/ctx"
 	"github.com/julian7/goshipdone/modules"
 	"github.com/magefile/mage/sh"
@@ -38,7 +40,12 @@ func NewSCP() modules.Pluggable {
 }
 
 // Run takes specified artifacts, and uploads them to a SSH server
-func (mod *SCP) Run(context *ctx.Context) error {
+func (mod *SCP) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	builds := context.Artifacts.OsArchByIDs(mod.Builds, mod.Skip)
 
 	cmdArgs := []string{}

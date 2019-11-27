@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"hash"
 	"io"
@@ -49,7 +50,12 @@ func NewChecksum() modules.Pluggable {
 	}
 }
 
-func (checksum *Checksum) Run(context *ctx.Context) error {
+func (checksum *Checksum) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	output, err := checksum.parseOutput(context)
 	if err != nil {
 		return fmt.Errorf("generating checksum filename: %w", err)
@@ -124,8 +130,12 @@ func checksumArtifact(hasher hash.Hash, artifact *ctx.Artifact) (string, error) 
 	), nil
 }
 
-func (checksum *Checksum) parseOutput(context *ctx.Context) (string, error) {
-	td := modules.NewTemplate(context)
+func (checksum *Checksum) parseOutput(cx context.Context) (string, error) {
+	td, err := modules.NewTemplate(cx)
+	if err != nil {
+		return "", err
+	}
+
 	td.Algo = checksum.Algorithm.String()
 
 	output, err := td.Parse("checksum", checksum.Output)

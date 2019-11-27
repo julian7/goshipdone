@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -68,7 +69,12 @@ func NewArtifact() modules.Pluggable {
 
 // Run uploads previously created artifact into artifact storage provided
 // by artifacts.Storage.
-func (mod *Artifact) Run(context *ctx.Context) error {
+func (mod *Artifact) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	var notes string
 
 	relNotes := []*ctx.Artifact(*context.Artifacts.ByID(mod.ReleaseNotes))
@@ -99,7 +105,10 @@ func (mod *Artifact) Run(context *ctx.Context) error {
 		return err
 	}
 
-	td := modules.NewTemplate(context)
+	td, err := modules.NewTemplate(context)
+	if err != nil {
+		return err
+	}
 
 	name, err := td.Parse("release-name", mod.ReleaseName)
 	if err != nil {

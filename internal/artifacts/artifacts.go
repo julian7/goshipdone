@@ -34,7 +34,12 @@ type (
 	}
 )
 
-func (s *Storage) GetToken(context *ctx.Context, tokenEnv, tokenFile string) string {
+func (s *Storage) GetToken(cx context.Context, tokenEnv, tokenFile string) string {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return ""
+	}
+
 	for _, envName := range []string{tokenEnv, s.Service.DefaultTokenEnv()} {
 		if envName == "" {
 			continue

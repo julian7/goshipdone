@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -36,7 +37,12 @@ func NewSkipPublish() modules.Pluggable {
 	}
 }
 
-func (mod *SkipPublish) Run(context *ctx.Context) error {
+func (mod *SkipPublish) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	if variable, ok := context.Env.Get(mod.EnvName); ok {
 		skip, err := strconv.ParseBool(variable)
 		if err != nil {

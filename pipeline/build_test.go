@@ -1,13 +1,13 @@
 package pipeline_test
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/julian7/goshipdone/ctx"
 	intmod "github.com/julian7/goshipdone/internal/modules"
 	"github.com/julian7/goshipdone/modules"
 	"github.com/julian7/goshipdone/pipeline"
@@ -21,7 +21,7 @@ func testModuleRegistrationFactory() modules.Pluggable {
 	return &testModuleRegistration{}
 }
 
-func (mod *testModuleRegistration) Run(*ctx.Context) error {
+func (mod *testModuleRegistration) Run(context.Context) error {
 	if mod.reporter != nil {
 		mod.reporter()
 	}
@@ -35,7 +35,7 @@ func testFailingModuleRegistrationFactory() modules.Pluggable {
 	return &testFailingModuleRegistration{}
 }
 
-func (mod *testFailingModuleRegistration) Run(*ctx.Context) error {
+func (mod *testFailingModuleRegistration) Run(context.Context) error {
 	return errors.New("error")
 }
 

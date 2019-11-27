@@ -4,9 +4,14 @@ package ctx
 
 import (
 	"context"
+	"errors"
 
 	"github.com/julian7/withenv"
 )
+
+type info struct{}
+
+var Info = &info{}
 
 // Context are a cumulative structure carried over to each module,
 // to contain data later steps might require
@@ -31,10 +36,24 @@ type GitData struct {
 	URL string
 }
 
-func New() *Context {
-	return &Context{
-		Context: context.Background(),
-		Env:     withenv.New(),
-		Git:     new(GitData),
+func New(ctx context.Context) context.Context {
+	return context.WithValue(
+		ctx,
+		Info,
+		&Context{
+			Context: ctx,
+			Env:     withenv.New(),
+			Git:     new(GitData),
+		},
+	)
+}
+
+// GetShipContext returns *ctx.Context from context.Context
+func GetShipContext(cx context.Context) (*Context, error) {
+	context, ok := cx.Value(Info).(*Context)
+	if !ok {
+		return nil, errors.New("ship context not provided")
 	}
+
+	return context, nil
 }

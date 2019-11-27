@@ -1,13 +1,13 @@
 package pipeline
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"strings"
 	"time"
 
-	"github.com/julian7/goshipdone/ctx"
 	"github.com/julian7/goshipdone/modules"
 	"gopkg.in/yaml.v3"
 )
@@ -15,10 +15,10 @@ import (
 // Stage is a single stage in the pipeline
 type Stage struct {
 	loaded  map[string]bool
-	Modules []*modules.Module       `yaml:"-"`
-	Name    string                  `yaml:"-"`
-	Plural  string                  `yaml:"-"`
-	SkipFN  func(*ctx.Context) bool `yaml:"-"`
+	Modules []*modules.Module          `yaml:"-"`
+	Name    string                     `yaml:"-"`
+	Plural  string                     `yaml:"-"`
+	SkipFN  func(context.Context) bool `yaml:"-"`
 }
 
 func NewStage(name, plural string) *Stage {
@@ -108,16 +108,16 @@ func (stg *Stage) Add(itemType string, node *yaml.Node, once bool) error {
 
 // Run goes through all internally loaded modules, and run them
 // one by one.
-func (stg *Stage) Run(context *ctx.Context) error {
+func (stg *Stage) Run(cx context.Context) error {
 	log.Printf("====> %s", strings.ToUpper(stg.Name))
 
 	startMod := time.Now()
 
-	if stg.SkipFN != nil && stg.SkipFN(context) {
+	if stg.SkipFN != nil && stg.SkipFN(cx) {
 		log.Printf("SKIPPED")
 	} else {
 		for _, module := range stg.Modules {
-			if err := module.Run(context); err != nil {
+			if err := module.Run(cx); err != nil {
 				return fmt.Errorf("stage %s: %w", stg.Name, err)
 			}
 		}

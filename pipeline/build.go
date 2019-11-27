@@ -1,6 +1,8 @@
 package pipeline
 
 import (
+	"context"
+
 	"github.com/julian7/goshipdone/ctx"
 	// register internal modules
 	_ "github.com/julian7/goshipdone/internal/modules"
@@ -23,7 +25,11 @@ func LoadBuildPipeline(ymlcontent []byte) (*Pipeline, error) {
 		{
 			Name:   "publish",
 			Plural: "publishes",
-			SkipFN: func(context *ctx.Context) bool {
+			SkipFN: func(cx context.Context) bool {
+				context, err := ctx.GetShipContext(cx)
+				if err != nil {
+					return true
+				}
 				return !context.Publish
 			},
 		},

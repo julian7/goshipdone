@@ -2,6 +2,7 @@ package modules
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"path"
@@ -49,7 +50,12 @@ func NewCutChangelog() modules.Pluggable {
 	}
 }
 
-func (mod *CutChangelog) Run(context *ctx.Context) error {
+func (mod *CutChangelog) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	contents, err := ioutil.ReadFile(mod.Input)
 	if err != nil {
 		return fmt.Errorf("reading original CHANGELOG %s: %w", mod.Input, err)

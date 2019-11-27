@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"os"
 	"path"
 
@@ -39,7 +40,12 @@ func NewProject() modules.Pluggable {
 }
 
 // Run records project's basic information into ctx.Context
-func (mod *Project) Run(context *ctx.Context) error {
+func (mod *Project) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	context.ProjectName = mod.Name
 	context.TargetDir = mod.TargetDir
 

@@ -3,6 +3,7 @@
 package pipeline
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -82,7 +83,7 @@ func (pip *Pipeline) StageByName(name string) *Stage {
 // Run executes build pipeline, calling Run on all
 // Modules
 func (pip *Pipeline) Run() error {
-	ctx := ctx.New()
+	ctx := ctx.New(context.Background())
 
 	for _, stg := range pip.Stages {
 		if err := stg.Run(ctx); err != nil {

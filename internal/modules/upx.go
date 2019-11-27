@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"os/exec"
 
 	"github.com/julian7/goshipdone/ctx"
@@ -32,9 +33,14 @@ func NewUPX() modules.Pluggable {
 }
 
 // Run calls upx on built artifacts, changing their artifact types
-func (archive *UPX) Run(context *ctx.Context) error {
+func (archive *UPX) Run(cx context.Context) error {
 	upxCmd, err := exec.LookPath("upx")
 
+	if err != nil {
+		return err
+	}
+
+	context, err := ctx.GetShipContext(cx)
 	if err != nil {
 		return err
 	}

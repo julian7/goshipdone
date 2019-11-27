@@ -2,6 +2,7 @@ package modules
 
 import (
 	"archive/tar"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -66,7 +67,12 @@ func NewTar() modules.Pluggable {
 	}
 }
 
-func (mod *Tar) Run(context *ctx.Context) error {
+func (mod *Tar) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	builds := context.Artifacts.OsArchByIDs(mod.Builds, mod.Skip)
 
 	if err := validateBuilds(builds); err != nil {
@@ -125,7 +131,7 @@ type tarSingleTarget struct {
 	Targets     *ctx.Artifacts
 }
 
-func (mod *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts) (*tarSingleTarget, error) {
+func (mod *Tar) singleTarget(cx context.Context, artifacts *ctx.Artifacts) (*tarSingleTarget, error) {
 	ret := &tarSingleTarget{
 		Arch:        (*artifacts)[0].Arch,
 		Compression: mod.Compression,
@@ -139,7 +145,11 @@ func (mod *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts) (*t
 		ret.Files[i] = mod.Files[i]
 	}
 
-	td := modules.NewTemplate(context)
+	td, err := modules.NewTemplate(cx)
+	if err != nil {
+		return nil, err
+	}
+
 	td.Arch = ret.Arch
 	td.OS = ret.OS
 	td.Ext = mod.Compression.Extension()
@@ -165,7 +175,12 @@ func (mod *Tar) singleTarget(context *ctx.Context, artifacts *ctx.Artifacts) (*t
 	return ret, nil
 }
 
-func (target *tarSingleTarget) Run(context *ctx.Context) error {
+func (target *tarSingleTarget) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	archiveFile := path.Join(context.TargetDir, target.Output)
 
 	archive, err := os.Create(archiveFile)

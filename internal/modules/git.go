@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/julian7/goshipdone/ctx"
@@ -27,7 +28,12 @@ func NewGit() modules.Pluggable {
 }
 
 // Run records git tag information into ctx.Context
-func (*Git) Run(context *ctx.Context) error {
+func (*Git) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	items := []struct {
 		name     string
 		required bool

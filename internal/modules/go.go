@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
@@ -92,31 +93,36 @@ func NewGo() modules.Pluggable {
 }
 
 // Run executes a go build step
-func (mod *Go) Run(context *ctx.Context) error {
-	targets, err := mod.targets(context)
+func (mod *Go) Run(cx context.Context) error {
+	targets, err := mod.targets(cx)
 
 	if err != nil {
 		return err
 	}
 
-	if err := mod.runHooks(context, mod.Before); err != nil {
+	if err := mod.runHooks(cx, mod.Before); err != nil {
 		return err
 	}
 
 	for _, tar := range targets {
-		if err := tar.Run(context); err != nil {
+		if err := tar.Run(cx); err != nil {
 			return err
 		}
 	}
 
-	if err := mod.runHooks(context, mod.After); err != nil {
+	if err := mod.runHooks(cx, mod.After); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (mod *Go) runHooks(context *ctx.Context, hooks []string) error {
+func (mod *Go) runHooks(cx context.Context, hooks []string) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	if len(hooks) == 0 {
 		return nil
 	}
@@ -131,7 +137,7 @@ func (mod *Go) runHooks(context *ctx.Context, hooks []string) error {
 	return nil
 }
 
-func (mod *Go) targets(context *ctx.Context) ([]modules.Pluggable, error) {
+func (mod *Go) targets(cx context.Context) ([]modules.Pluggable, error) {
 	targets := []modules.Pluggable{}
 
 	for _, goos := range mod.GOOS {
@@ -144,7 +150,7 @@ func (mod *Go) targets(context *ctx.Context) ([]modules.Pluggable, error) {
 				}
 			}
 
-			target, err := mod.singleTarget(context, goos, goarch)
+			target, err := mod.singleTarget(cx, goos, goarch)
 
 			if err != nil {
 				return nil, err
@@ -157,8 +163,17 @@ func (mod *Go) targets(context *ctx.Context) ([]modules.Pluggable, error) {
 	return targets, nil
 }
 
-func (mod *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.Pluggable, error) {
-	td := modules.NewTemplate(context)
+func (mod *Go) singleTarget(cx context.Context, goos, goarch string) (modules.Pluggable, error) {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return nil, err
+	}
+
+	td, err := modules.NewTemplate(cx)
+	if err != nil {
+		return nil, err
+	}
+
 	td.Arch = goarch
 	td.OS = goos
 
@@ -180,8 +195,6 @@ func (mod *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.
 
 	tar.Env.Set("GOOS", goos)
 	tar.Env.Set("GOARCH", goarch)
-
-	var err error
 
 	tasks := []struct {
 		name   string
@@ -205,11 +218,15 @@ func (mod *Go) singleTarget(context *ctx.Context, goos, goarch string) (modules.
 	return tar, nil
 }
 
-func (tar *goSingleTarget) Run(context *ctx.Context) error {
+func (tar *goSingleTarget) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	output := path.Join(tar.OutDir, tar.Output)
 
-	err := tar.Env.Run("go", "build", "-o", output, "-ldflags", tar.LDFlags, tar.Main)
-	if err != nil {
+	if err := tar.Env.Run("go", "build", "-o", output, "-ldflags", tar.LDFlags, tar.Main); err != nil {
 		_ = os.Remove(output)
 		return err
 	}

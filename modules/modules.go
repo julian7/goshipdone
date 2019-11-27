@@ -3,17 +3,16 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
-
-	"github.com/julian7/goshipdone/ctx"
 )
 
 type (
 	// Pluggable is a module, which can be pluggable into a pipeline
 	Pluggable interface {
-		Run(*ctx.Context) error
+		Run(context.Context) error
 	}
 
 	// Module is a single module, specifying its type and its Pluggable
@@ -24,12 +23,12 @@ type (
 )
 
 // Run executes a module, and measures its wallclock time spent
-func (mod *Module) Run(context *ctx.Context) error {
+func (mod *Module) Run(ctx context.Context) error {
 	log.Printf("----> %s", mod.Type)
 
 	start := time.Now()
 
-	if err := mod.Pluggable.Run(context); err != nil {
+	if err := mod.Pluggable.Run(ctx); err != nil {
 		return fmt.Errorf("%s: %w", mod.Type, err)
 	}
 

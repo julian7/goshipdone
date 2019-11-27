@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"log"
 	"sort"
 
@@ -26,7 +27,12 @@ func NewShow() modules.Pluggable {
 }
 
 // Run provides a list of artifacts recorded so far
-func (Show) Run(context *ctx.Context) error {
+func (Show) Run(cx context.Context) error {
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return err
+	}
+
 	envKeys := make([]string, 0, len(context.Env.Vars))
 	for key := range context.Env.Vars {
 		envKeys = append(envKeys, key)
