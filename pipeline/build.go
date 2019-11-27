@@ -43,7 +43,7 @@ func LoadBuildPipeline(ymlcontent []byte) (*Pipeline, error) {
 	for _, kind := range []string{
 		"setup:env",
 		"setup:project",
-		"setup:git_tag",
+		"setup:git",
 		"setup:skip_publish",
 	} {
 		_ = pipeline.LoadDefault(kind)

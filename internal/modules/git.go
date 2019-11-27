@@ -17,7 +17,7 @@ type Git struct{}
 func init() {
 	modules.RegisterModule(&modules.ModuleRegistration{
 		Stage:   "setup",
-		Type:    "git_tag",
+		Type:    "git",
 		Factory: NewGit,
 	})
 }

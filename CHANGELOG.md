@@ -15,6 +15,7 @@ Added:
 
 Changed:
 
+- rename setup:git_tag to setup:git
 - use context.Context everywhere
 - make pipeline generic, rename modules to stage
 - replace environment handler with withenv
