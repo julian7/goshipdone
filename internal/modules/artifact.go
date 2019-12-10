@@ -93,14 +93,7 @@ func (mod *Artifact) Run(cx context.Context) error {
 		return errors.New("multiple release notes found")
 	}
 
-	client, err := mod.Storage.New(
-		context.Context,
-		mod.URL,
-		mod.Storage.GetToken(context, mod.TokenEnv, mod.TokenFile),
-		mod.Owner,
-		mod.Name,
-		mod.getTLSConfig(),
-	)
+	client, err := mod.NewClient(cx)
 	if err != nil {
 		return err
 	}
@@ -133,6 +126,18 @@ func (mod *Artifact) Run(cx context.Context) error {
 	}
 
 	return nil
+}
+
+// NewClient returns a new Storage connection
+func (mod *Artifact) NewClient(cx context.Context) (artifacts.Connection, error) {
+	return mod.Storage.New(
+		cx,
+		mod.URL,
+		mod.Storage.GetToken(cx, mod.TokenEnv, mod.TokenFile),
+		mod.Owner,
+		mod.Name,
+		mod.getTLSConfig(),
+	)
 }
 
 func (mod *Artifact) getTLSConfig() *tls.Config {
