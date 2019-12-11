@@ -46,15 +46,6 @@ type (
 	}
 )
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "build",
-		Type:    "tar",
-		Factory: NewTar,
-	})
-}
-
 func NewTar() modules.Pluggable {
 	return &Tar{
 		Builds:      []string{"default"},

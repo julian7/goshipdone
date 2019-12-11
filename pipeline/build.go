@@ -4,8 +4,7 @@ import (
 	"context"
 
 	"github.com/julian7/goshipdone/ctx"
-	// register internal modules
-	_ "github.com/julian7/goshipdone/internal/modules"
+	"github.com/julian7/goshipdone/internal/modules"
 	"gopkg.in/yaml.v3"
 )
 
@@ -13,6 +12,8 @@ import (
 // contents of a byte slice. Then, it makes sure default modules
 // are loaded, providing safe defaults.
 func LoadBuildPipeline(ymlcontent []byte) (*Pipeline, error) {
+	modules.Register()
+
 	pipeline := New([]*Stage{
 		{
 			Name:   "setup",

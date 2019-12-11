@@ -19,15 +19,6 @@ type UPX struct {
 	Skip []string
 }
 
-//nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "build",
-		Type:    "upx",
-		Factory: NewUPX,
-	})
-}
-
 func NewUPX() modules.Pluggable {
 	return &UPX{Builds: []string{"default"}}
 }

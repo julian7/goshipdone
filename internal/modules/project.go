@@ -15,15 +15,6 @@ type Project struct {
 	TargetDir string `yaml:"target"`
 }
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "setup",
-		Type:    "project",
-		Factory: NewProject,
-	})
-}
-
 // NewProject is the factory function for Project
 func NewProject() modules.Pluggable {
 	pwd, err := os.Getwd()

@@ -18,15 +18,6 @@ const (
 // Env module sets up context's Env hash
 type Env struct{}
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "setup",
-		Type:    "env",
-		Factory: NewEnv,
-	})
-}
-
 func NewEnv() modules.Pluggable {
 	return &Env{}
 }

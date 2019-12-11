@@ -13,15 +13,6 @@ import (
 // `Version` information into `ctx.Context`
 type Git struct{}
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "setup",
-		Type:    "git",
-		Factory: NewGit,
-	})
-}
-
 // NewGit is the factory function for Git
 func NewGit() modules.Pluggable {
 	return &Git{}

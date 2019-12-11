@@ -21,15 +21,6 @@ type SCP struct {
 	Target string
 }
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "publish",
-		Type:    "scp",
-		Factory: NewSCP,
-	})
-}
-
 // NewSCP is a factory function for SCP module
 func NewSCP() modules.Pluggable {
 	return &SCP{

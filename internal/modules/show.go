@@ -12,15 +12,6 @@ import (
 // Show is a module for listing all recorded artifacts so far
 type Show struct{}
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "*",
-		Type:    "show",
-		Factory: NewShow,
-	})
-}
-
 // NewShow returns a new Show module
 func NewShow() modules.Pluggable {
 	return &Show{}

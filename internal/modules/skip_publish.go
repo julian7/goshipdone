@@ -21,15 +21,6 @@ type SkipPublish struct {
 	EnvName string `yaml:"env_name"`
 }
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "setup",
-		Type:    "skip_publish",
-		Factory: NewSkipPublish,
-	})
-}
-
 // NewSkipPublish is a factory method for SkipPublish plugin
 func NewSkipPublish() modules.Pluggable {
 	return &SkipPublish{

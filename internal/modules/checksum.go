@@ -30,15 +30,6 @@ type Checksum struct {
 	Skip []string
 }
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "build",
-		Type:    "checksum",
-		Factory: NewChecksum,
-	})
-}
-
 func NewChecksum() modules.Pluggable {
 	algo, _ := NewHashAlgorithm("sha256")
 

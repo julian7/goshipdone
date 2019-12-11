@@ -33,15 +33,6 @@ type CutChangelog struct {
 	Output string
 }
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "build",
-		Type:    "changelog",
-		Factory: NewCutChangelog,
-	})
-}
-
 func NewCutChangelog() modules.Pluggable {
 	return &CutChangelog{
 		ID:     "changelog",

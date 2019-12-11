@@ -47,15 +47,6 @@ type Artifact struct {
 	URL string
 }
 
-// nolint: gochecknoinits
-func init() {
-	modules.RegisterModule(&modules.ModuleRegistration{
-		Stage:   "publish",
-		Type:    "artifact",
-		Factory: NewArtifact,
-	})
-}
-
 // NewArtifact is a factory method for Artifact module
 func NewArtifact() modules.Pluggable {
 	storage, _ := artifacts.New("github")
