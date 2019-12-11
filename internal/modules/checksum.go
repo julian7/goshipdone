@@ -47,7 +47,7 @@ func (checksum *Checksum) Run(cx context.Context) error {
 		return err
 	}
 
-	output, err := checksum.parseOutput(context)
+	output, err := checksum.parseOutput(cx)
 	if err != nil {
 		return fmt.Errorf("generating checksum filename: %w", err)
 	}

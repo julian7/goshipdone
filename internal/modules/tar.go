@@ -71,12 +71,12 @@ func (mod *Tar) Run(cx context.Context) error {
 	}
 
 	for osarch := range builds {
-		target, err := mod.singleTarget(context, builds[osarch])
+		target, err := mod.singleTarget(cx, builds[osarch])
 		if err != nil {
 			return err
 		}
 
-		if err := target.Run(context); err != nil {
+		if err := target.Run(cx); err != nil {
 			return err
 		}
 	}
