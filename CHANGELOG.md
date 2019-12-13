@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-No changes so far.
+Fixed:
+
+- read from default token file. Fixes [#9](https://github.com/julian7/goshipdone/issues/9)
 
 ## [v0.4.1] - 2019-12-13
 

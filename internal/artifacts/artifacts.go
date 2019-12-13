@@ -55,14 +55,15 @@ func (s *Storage) GetToken(cx context.Context, tokenEnv, tokenFile string) strin
 			continue
 		}
 
+		fileName := context.Env.Expand(fileName)
 		if _, err := os.Stat(fileName); err != nil {
 			log.Printf("cannot stat tokenfile `%s`: %v", fileName, err)
 			break
 		}
 
-		data, err := ioutil.ReadFile(tokenFile)
+		data, err := ioutil.ReadFile(fileName)
 		if err != nil {
-			log.Printf("tokenfile read error: %v", err)
+			log.Printf("tokenfile '%s' read error: %v", tokenFile, err)
 			break
 		}
 
