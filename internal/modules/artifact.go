@@ -89,7 +89,7 @@ func (mod *Artifact) Run(cx context.Context) error {
 		return err
 	}
 
-	td, err := modules.NewTemplate(context)
+	td, err := modules.NewTemplate(cx)
 	if err != nil {
 		return err
 	}
