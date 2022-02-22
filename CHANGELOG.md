@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+No changes so far.
+
+## [v0.5.0] - 2022-02-22
+
 Added:
 
 - ARM 32bit support (setting with GOARM)
@@ -99,7 +103,8 @@ Changed:
 - rename project to goshipdone
 - fold release_note into archive
 
-[Unreleased]: https://github.com/julian7/goshipdone/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/julian7/goshipdone/compare/v0.5.0...HEAD
+[v0.5.0]: https://github.com/julian7/goshipdone/compare/v0.4.1...v0.5.0
 [v0.4.1]: https://github.com/julian7/goshipdone/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/julian7/goshipdone/compare/v0.3.0...v0.4.0
 [v0.3.0]: https://github.com/julian7/goshipdone/compare/v0.2.0...v0.3.0
