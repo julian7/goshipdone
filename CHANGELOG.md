@@ -11,6 +11,10 @@ Added:
 
 - ARM 32bit support (setting with GOARM)
 
+Changed:
+
+- Updated dependencies, go version up to 1.17
+
 Fixed:
 
 - read from default token file. Fixes [#9](https://github.com/julian7/goshipdone/issues/9)

@@ -36,7 +36,7 @@ func (arts *Artifacts) ByID(id string) *Artifacts {
 	return results
 }
 
-//OsArchByIDs maps artifacts by OS-Arch, filtering by IDs
+// OsArchByIDs maps artifacts by OS-Arch, filtering by IDs
 func (arts *Artifacts) OsArchByIDs(ids []string, skips []string) map[string]*Artifacts {
 	skipIndex := make(map[string]bool, len(skips))
 

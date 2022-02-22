@@ -9,7 +9,7 @@ import (
 
 func TestGitLabClient_ProjectID(t *testing.T) {
 	ctx := context.Background()
-	client := gitlab.NewClient(nil, "")
+	client, _ := gitlab.NewClient("")
 	tests := []struct {
 		name      string
 		namespace string

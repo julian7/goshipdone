@@ -49,16 +49,30 @@ func (*GitLabService) New(
 	url, token, namespace, name string,
 	options *tls.Config,
 ) (Connection, error) {
-	client := &GitLabClient{Context: ctx, Name: name, Namespace: namespace}
-	client.connection(ctx, token, options)
+	opts := []gitlab.ClientOptionFunc{}
 
 	if url != "" {
-		if err := client.SetBaseURL(url); err != nil {
-			return nil, err
-		}
+		opts = append(opts, gitlab.WithBaseURL(url))
 	}
 
-	return client, nil
+	if options != nil {
+		opts = append(opts, gitlab.WithHTTPClient(&http.Client{
+			Transport: &http.Transport{TLSClientConfig: options},
+		}))
+	}
+
+	client, err := gitlab.NewClient(token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitLabClient{
+		Client:    client,
+		Context:   ctx,
+		Name:      name,
+		Namespace: namespace,
+	}, nil
 }
 
 func (c *GitLabClient) NewReleaser(tag, ref, version string) (Releaser, error) {
@@ -82,16 +96,6 @@ func (c *GitLabClient) ProjectPath() string {
 
 func (c *GitLabClient) ProjectID() string {
 	return strings.Replace(url.PathEscape(c.ProjectPath()), ".", "%2E", -1)
-}
-
-func (c *GitLabClient) connection(_ context.Context, token string, options *tls.Config) {
-	httpClient := &http.Client{}
-
-	if options != nil {
-		httpClient.Transport = &http.Transport{TLSClientConfig: options}
-	}
-
-	c.Client = gitlab.NewClient(httpClient, token)
 }
 
 func (rel *GitLabRelease) Release(name, notes string) error {
