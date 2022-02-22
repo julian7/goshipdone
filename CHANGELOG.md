@@ -14,6 +14,7 @@ Added:
 Changed:
 
 - Updated dependencies, go version up to 1.17
+- Change default branch to "main"
 
 Fixed:
 
