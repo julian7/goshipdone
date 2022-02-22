@@ -27,6 +27,11 @@ type (
 		// GOArch is a list of all GOARCH variations required. It is
 		// set to [`amd64`] by default.
 		GOArch []string
+		// GOArm is a list of all GOARM variations required. GOARM=6 is
+		// used by default, as golang's internal default. Providing multiple
+		// GOArm entries provides multiple builds while in GOOS=linux and
+		// GOARCH=arm setting.
+		GOArm []string
 		// ID contains the artifact's name used by later stages of the build
 		// pipeline. Archives, and Publishes may refer to this name for
 		// referencing build results.
@@ -61,6 +66,7 @@ type (
 
 	goSingleTarget struct {
 		Arch    string
+		Arm     string
 		Env     *withenv.Env
 		ID      string
 		LDFlags string
@@ -86,6 +92,7 @@ func NewGo() modules.Pluggable {
 		LDFlags: "-s -w -X main.version={{.Version}}",
 		GOOS:    []string{"linux", "windows"},
 		GOArch:  []string{"amd64"},
+		GOArm:   []string{"6"},
 		Main:    ".",
 		ID:      "default",
 		Output:  "{{.ProjectName}}{{.Ext}}",
@@ -141,60 +148,57 @@ func (mod *Go) targets(cx context.Context) ([]modules.Pluggable, error) {
 	targets := []modules.Pluggable{}
 
 	for _, goos := range mod.GOOS {
-	NextArch:
 		for _, goarch := range mod.GOArch {
-			osarch := fmt.Sprintf("%s-%s", goos, goarch)
-			for _, skip := range mod.Skip {
-				if osarch == skip {
-					continue NextArch
+			arms := []string{""}
+			if goos == "linux" && goarch == "arm" {
+				arms = mod.GOArm
+			}
+
+			for _, goarm := range arms {
+				target, err := mod.singleTarget(cx, goos, goarch, goarm)
+				if err != nil {
+					return nil, err
 				}
+
+				if target == nil {
+					continue
+				}
+
+				targets = append(targets, target)
 			}
-
-			target, err := mod.singleTarget(cx, goos, goarch)
-
-			if err != nil {
-				return nil, err
-			}
-
-			targets = append(targets, target)
 		}
 	}
 
 	return targets, nil
 }
 
-func (mod *Go) singleTarget(cx context.Context, goos, goarch string) (modules.Pluggable, error) {
-	context, err := ctx.GetShipContext(cx)
-	if err != nil {
-		return nil, err
-	}
-
-	td, err := modules.NewTemplate(cx)
-	if err != nil {
-		return nil, err
-	}
-
-	td.Arch = goarch
-	td.OS = goos
-
-	if goos == "windows" {
-		td.Ext = ".exe"
-	}
-
+func (mod *Go) singleTarget(cx context.Context, goos, goarch, goarm string) (modules.Pluggable, error) {
 	tar := &goSingleTarget{
 		Arch: goarch,
+		Arm:  goarm,
 		Env:  withenv.New(),
 		ID:   mod.ID,
 		Main: mod.Main,
 		OS:   goos,
 	}
 
+	tar.SetGoEnv()
+
+	osarch := tar.OsArch()
+	for _, skip := range mod.Skip {
+		if osarch == skip {
+			return nil, nil
+		}
+	}
+
+	context, err := ctx.GetShipContext(cx)
+	if err != nil {
+		return nil, err
+	}
+
 	for key, val := range context.Env.Vars {
 		tar.Env.Set(key, val)
 	}
-
-	tar.Env.Set("GOOS", goos)
-	tar.Env.Set("GOARCH", goarch)
 
 	tasks := []struct {
 		name   string
@@ -208,6 +212,18 @@ func (mod *Go) singleTarget(cx context.Context, goos, goarch string) (modules.Pl
 		{"output", mod.Output, &tar.Output},
 	}
 
+	td, err := modules.NewTemplate(cx)
+	if err != nil {
+		return nil, err
+	}
+
+	td.Arch = tar.FullArch()
+	td.OS = tar.OS
+
+	if goos == "windows" {
+		td.Ext = ".exe"
+	}
+
 	for _, item := range tasks {
 		(*item.target), err = td.Parse("build:go", item.source)
 		if err != nil {
@@ -216,6 +232,27 @@ func (mod *Go) singleTarget(cx context.Context, goos, goarch string) (modules.Pl
 	}
 
 	return tar, nil
+}
+
+func (tar *goSingleTarget) SetGoEnv() {
+	tar.Env.Set("GOOS", tar.OS)
+	tar.Env.Set("GOARCH", tar.Arch)
+
+	if tar.Arm != "" {
+		tar.Env.Set("GOARM", tar.Arm)
+	}
+}
+
+func (tar *goSingleTarget) OsArch() string {
+	return fmt.Sprintf("%s-%s", tar.OS, tar.FullArch())
+}
+
+func (tar *goSingleTarget) FullArch() string {
+	if len(tar.Arm) > 0 {
+		return fmt.Sprintf("%sv%s", tar.Arch, tar.Arm)
+	}
+
+	return tar.Arch
 }
 
 func (tar *goSingleTarget) Run(cx context.Context) error {
@@ -232,7 +269,7 @@ func (tar *goSingleTarget) Run(cx context.Context) error {
 	}
 
 	context.Artifacts.Add(&ctx.Artifact{
-		Arch:     tar.Arch,
+		Arch:     tar.FullArch(),
 		Filename: tar.Output,
 		Location: output,
 		ID:       tar.ID,

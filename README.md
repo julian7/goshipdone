@@ -55,19 +55,27 @@ It is possible to register your own modules before calling `goshipdone.Run()`, w
 ```yaml
 ---
 setups:
-  - type: project
-    name: hello_world
+- type: project
+  name: hello_world
 builds:
-  - type: go
-    goos: ["linux"]
-    goarch: ["amd64"]
+- type: go
+  goos:
+  - linux
+  goarch:
+  - amd64
 publish:
-  - type: show
+- type: show
 ```
 
 Each stage takes an array of modules, selected by their types (see below), and configured by the rest of the values.
 
 There are automatically loaded setup modules, to provide sane default values when not defined.
+
+## Common fields
+
+- **id**: resulting artifact ID, other builders and publishers can take
+- **skip**: OS - arch combinations to be skipped, both while building, or further handling already created artifacts. ARM (32bit) artifacts in Linux OS can have a "v5" / "v6" / "v7" suffix, reflecting to ARM v5, v6, or v7, respectively.
+- **type**: module name, usually inside a stage (wrt. `*:show` as an exception)
 
 ## Default Modules
 
@@ -152,6 +160,7 @@ Parameters:
 | before | [] | commands to run after build |
 | goos | ["windows", "linux"] | list of GOOS values |
 | goarch | ["amd64"] | list of GOARCH values |
+| goarm | ["6"] | list of GOARM values (effective only if GOOS == "linux" and GOARCH == "amd64") |
 | id | default | resulting artifact ID |
 | ldflags | -s -w -X main.version={{.Version}} | LDFLAGS template for go build |
 | main | . | module where `main()` method is defined
