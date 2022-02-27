@@ -1,55 +1,55 @@
 ---
 setup:
-  - type: project
-    id: goshipdone
-    target: target
+- type: project
+  id: goshipdone
+  target: target
 builds:
-  - type: go
-    ldflags: "-s -w -X main.version={{.Version}}"
-    main: ./build
-    id: builder
-    output: "builder{{.Ext}}"
-    goos:
-      - darwin
-      - linux
-      - windows
-    goarch:
-      - amd64
-    before:
-      - go mod tidy
-      - go test ./...
-      - go generate ./...
-  - type: show
-  - type: changelog
-    id: changelog
-  - type: upx
-    builds:
-      - builder
-  - type: tar
-    builds:
-      - builder
-    compression: gzip
-    id: targz
-  - type: checksum
-    builds:
-      - builder
-    output: "{{.ProjectName}}-{{.Version}}-files-checksums.txt"
-  - type: checksum
-    id: buildchecksum
-    builds:
-      - targz
-    output: "{{.ProjectName}}-{{.Version}}-checksums.txt"
+- type: go
+  ldflags: "-s -w -X main.version={{.Version}}"
+  main: ./build
+  id: builder
+  output: "builder{{OSExt}}"
+  goos:
+    - darwin
+    - linux
+    - windows
+  goarch:
+    - amd64
+  before:
+    - go mod tidy
+    - go test ./...
+    - go generate ./...
+- type: show
+- type: changelog
+  id: changelog
+- type: upx
+  builds:
+    - builder
+- type: tar
+  builds:
+    - builder
+  compression: gzip
+  id: targz
+- type: checksum
+  builds:
+    - builder
+  output: "{{.ProjectName}}-{{.Version}}-files-checksums.txt"
+- type: checksum
+  id: buildchecksum
+  builds:
+    - targz
+  output: "{{.ProjectName}}-{{.Version}}-checksums.txt"
 publishes:
-  - type: show
-  - type: github
-    builds:
-      - targz
-      - buildchecksum
-    owner: julian7
-    name: goshipdone
-    release_notes: changelog
-  # - type: scp
-  #   builds:
-  #     - targz
-  #     - buildchecksum
-  #   target: staticfiles@remoteserver.com:/var/www/default/public
+- type: show
+- type: github
+  builds:
+    - targz
+    - buildchecksum
+  owner: julian7
+  name: goshipdone
+  release_notes: changelog
+# - type: scp
+#   builds:
+#     - targz
+#     - buildchecksum
+#   target: staticfiles@remoteserver.com:/var/www/default/public

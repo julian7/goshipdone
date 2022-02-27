@@ -1,6 +1,9 @@
 package ctx
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type (
 	// Artifacts is a slice of Artifact
@@ -22,6 +25,7 @@ type (
 
 // Add registers a new artifact in Artifacts
 func (arts *Artifacts) Add(artifact *Artifact) {
+	log.Printf("      storing artifact %s as %s (%s)", artifact.Filename, artifact.ID, artifact.OSArch())
 	*arts = append(*arts, artifact)
 }
 
@@ -50,7 +54,7 @@ func (arts *Artifacts) OsArchByIDs(ids []string, skips []string) map[string]*Art
 
 	for _, id := range ids {
 		for _, art := range *arts.ByID(id) {
-			osarch := art.OsArch()
+			osarch := art.OSArch()
 			if _, ok := skipIndex[osarch]; ok {
 				continue
 			}
@@ -67,6 +71,6 @@ func (arts *Artifacts) OsArchByIDs(ids []string, skips []string) map[string]*Art
 }
 
 // OsArch returns artifact's os-arch string
-func (art *Artifact) OsArch() string {
+func (art *Artifact) OSArch() string {
 	return fmt.Sprintf("%s-%s", art.OS, art.ArchName)
 }

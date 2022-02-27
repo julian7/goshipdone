@@ -176,11 +176,11 @@ Parameters:
 | name | default | description |
 | :--- | :------ | :---------- |
 | builds | ["artifact"] | Array of artifacts to be put into tar archives |
-| commondir | {{.ProjectName}}-{{.Version}}-{{.OS}}-{{.Arch}} | topmost subdirectory name inside each tar archive |
+| commondir | {{.ProjectName}}-{{.Version}}-{{OS}}-{{Arch}} | topmost subdirectory name inside each tar archive |
 | compression | none | compression algorithm to be used |
 | files | ["README*"] | files to be copied into each tar archive |
 | id | archive | resulting artifact ID |
-| output | {{.ProjectName}}-{{.Version}}-{{.OS}}-{{.Arch}}.tar{{.Ext}} | artifact file name template |
+| output | {{.ProjectName}}-{{.Version}}-{{OS}}-{{Arch}}.tar{{Ext}} | artifact file name template |
 | skip | [] | OS - arch combinations to be skipped |
 
 This module takes previously built artifacts (see `builds`), and put them into a tar archive, for each OS - arch combination (except skipped ones). It is also able to put static files existing in the project directory. They will be written into archive files defined by `output` parameter, and they will be registered as an artifact identified by `id` parameter.

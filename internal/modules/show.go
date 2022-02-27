@@ -40,7 +40,7 @@ func (Show) Run(cx context.Context) error {
 	log.Printf("Artifacts:")
 
 	for _, art := range context.Artifacts {
-		log.Printf("- %s: %s (%s)", art.ID, art.Filename, art.OsArch())
+		log.Printf("- %s: %s (%s)", art.ID, art.Filename, art.OSArch())
 	}
 
 	return nil

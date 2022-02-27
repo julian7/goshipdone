@@ -78,7 +78,7 @@ func NewGo() modules.Pluggable {
 		GOArm:   []int32{6},
 		Main:    ".",
 		ID:      "default",
-		Output:  "{{.ProjectName}}{{.Ext}}",
+		Output:  "{{.ProjectName}}{{OSExt}}",
 	}
 }
 

@@ -16,21 +16,14 @@ import (
 type TemplateData struct {
 	// Algo represents algorithm. Hashing and signing modules use them.
 	Algo string
-	// Arch defines target architecture
-	Arch string
-	// ArchName is a textual representation of Arch, optionally combining 32bit ARM versions
-	// eg. GOARCH=arm GOARM=6 means ArchName=armv6
-	ArchName string
-	// ArmVersion is the 32bit arm version (supported: 5, 6, 7)
-	ArmVersion int32
 	// ArchiveName defines a URL where the resource will be remotely available
 	ArchiveName string
 	// Env is a copy of environment variables set in ctx.Context
 	Env *withenv.Env
 	// Git is a copy of git-related info from ctx.Context
 	Git *ctx.GitData
-	// OS defines target operating system
-	OS string
+	// OSArch defines target operating system and architecture
+	OSArch *ctx.OsArch
 	// ProjectName defines local filename of the resource
 	ProjectName string
 	// Version defines artifact's version
@@ -55,7 +48,18 @@ func NewTemplate(cx context.Context) (*TemplateData, error) {
 
 // Parse parses a string based on TemplateData, and returns output in string format
 func (td *TemplateData) Parse(name, text string) (string, error) {
-	tmpl := template.New(name)
+	tmpl := template.New(name).Funcs(template.FuncMap{
+		"Arch":     func() string { return td.OSArch.Arch },
+		"ArchName": func() string { return td.OSArch.ArchName() },
+		"OS":       func() string { return td.OSArch.OS },
+		"OSExt": func() string {
+			if td.OSArch.OS == "windows" {
+				return ".exe"
+			}
+
+			return ""
+		},
+	})
 	_, err := tmpl.Parse(text)
 
 	if err != nil {
