@@ -10,11 +10,13 @@ type (
 	// be further processed by later steps (eg. a build result put into
 	// an archive)
 	Artifact struct {
-		Arch     string
-		Filename string
-		ID       string
-		Location string
-		OS       string
+		Arch       string
+		ArchName   string
+		ArmVersion int32
+		Filename   string
+		ID         string
+		Location   string
+		OS         string
 	}
 )
 
@@ -66,5 +68,5 @@ func (arts *Artifacts) OsArchByIDs(ids []string, skips []string) map[string]*Art
 
 // OsArch returns artifact's os-arch string
 func (art *Artifact) OsArch() string {
-	return fmt.Sprintf("%s-%s", art.OS, art.Arch)
+	return fmt.Sprintf("%s-%s", art.OS, art.ArchName)
 }

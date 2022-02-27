@@ -18,6 +18,11 @@ type TemplateData struct {
 	Algo string
 	// Arch defines target architecture
 	Arch string
+	// ArchName is a textual representation of Arch, optionally combining 32bit ARM versions
+	// eg. GOARCH=arm GOARM=6 means ArchName=armv6
+	ArchName string
+	// ArmVersion is the 32bit arm version (supported: 5, 6, 7)
+	ArmVersion int32
 	// ArchiveName defines a URL where the resource will be remotely available
 	ArchiveName string
 	// Env is a copy of environment variables set in ctx.Context

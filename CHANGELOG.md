@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-No changes so far.
+Changed:
+
+- Separate Arch, ArchName, and ArmVersion, to allow sensulib modules to accurately
+  filter for ARM version in sensu asset filters.
 
 ## [v0.5.0] - 2022-02-22
 
