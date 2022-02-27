@@ -118,13 +118,13 @@ func errNumTargets(bad, good string, builds map[string]*ctx.Artifacts) error {
 	}
 
 	for _, art := range *builds[good] {
-		targets[art.OSArch()] = true
+		targets[art.OsArch.String()] = true
 	}
 
 	_, ok = builds[bad]
 	if ok && len(*builds[bad]) > 0 {
 		for _, art := range *builds[bad] {
-			targets[art.OSArch()] = false
+			targets[art.OsArch.String()] = false
 		}
 	}
 

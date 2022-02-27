@@ -19,7 +19,7 @@ type tarSingleTarget struct {
 	DirsWritten map[string]bool
 	Files       []string
 	ID          string
-	OSArch      *ctx.OsArch
+	osarch      *ctx.OsArch
 	Output      string
 	Targets     *ctx.Artifacts
 }
@@ -31,12 +31,8 @@ func (mod *Tar) singleTarget(cx context.Context, artifacts *ctx.Artifacts) (*tar
 		DirsWritten: map[string]bool{},
 		Files:       make([]string, len(mod.Files)),
 		ID:          mod.ID,
-		OSArch: &ctx.OsArch{
-			Arch:       art.OS,
-			ArmVersion: art.ArmVersion,
-			OS:         art.OS,
-		},
-		Targets: artifacts,
+		osarch:      art.OsArch,
+		Targets:     artifacts,
 	}
 
 	for i := range mod.Files {
@@ -48,7 +44,7 @@ func (mod *Tar) singleTarget(cx context.Context, artifacts *ctx.Artifacts) (*tar
 		return nil, err
 	}
 
-	td.OSArch = ret.OSArch
+	td.OSArch = ret.osarch
 
 	td.Ext = mod.Compression.Extension()
 
@@ -107,13 +103,10 @@ func (target *tarSingleTarget) Run(cx context.Context) error {
 	}
 
 	context.Artifacts.Add(&ctx.Artifact{
-		Arch:       target.OSArch.Arch,
-		ArchName:   target.OSArch.ArchName(),
-		ArmVersion: target.OSArch.ArmVersion,
-		Filename:   target.Output,
-		Location:   archiveFile,
-		ID:         target.ID,
-		OS:         target.OSArch.OS,
+		Filename: target.Output,
+		Location: archiveFile,
+		ID:       target.ID,
+		OsArch:   target.osarch,
 	})
 
 	return nil

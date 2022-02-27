@@ -12,17 +12,32 @@ func TestArtifacts_Add(t *testing.T) {
 		wantsCount int
 	}{
 		{
-			name:       "first",
-			artifacts:  nil,
-			arg:        &Artifact{ID: "default", Location: "dist/default", Filename: "default", OS: "linux", Arch: "amd64"},
+			name:      "first",
+			artifacts: nil,
+			arg: &Artifact{
+				ID:       "default",
+				Location: "dist/default",
+				Filename: "default",
+				OsArch:   &OsArch{OS: "linux", Arch: "amd64"},
+			},
 			wantsCount: 1,
 		},
 		{
 			name: "second",
 			artifacts: Artifacts{
-				&Artifact{Filename: "default", Location: "dist/default", ID: "default", OS: "windows", Arch: "amd64"},
+				&Artifact{
+					Filename: "default",
+					Location: "dist/default",
+					ID:       "default",
+					OsArch:   &OsArch{OS: "windows", Arch: "amd64"},
+				},
 			},
-			arg:        &Artifact{ID: "default", Location: "dist/default", Filename: "default", OS: "linux", Arch: "amd64"},
+			arg: &Artifact{
+				ID:       "default",
+				Location: "dist/default",
+				Filename: "default",
+				OsArch:   &OsArch{OS: "linux", Arch: "amd64"},
+			},
 			wantsCount: 2,
 		},
 	}
@@ -53,12 +68,12 @@ func TestArtifacts_ByID(t *testing.T) {
 	}{
 		{"empty", nil, "nonexisting", 0},
 		{"notfound", Artifacts{
-			&Artifact{Location: "dist/a/b", Filename: "a/b", ID: "a", OS: "linux", Arch: "386"},
+			&Artifact{Location: "dist/a/b", Filename: "a/b", ID: "a", OsArch: &OsArch{OS: "linux", Arch: "386"}},
 		}, "b", 0},
 		{"found", Artifacts{
-			&Artifact{Location: "dist/a/b", Filename: "a/b", ID: "a", OS: "linux", Arch: "386"},
-			&Artifact{Location: "dist/a/b.exe", Filename: "a/b.exe", ID: "a", OS: "windows", Arch: "386"},
-			&Artifact{Location: "dist/a/c", Filename: "a/c", ID: "c", OS: "linux", Arch: "386"},
+			&Artifact{Location: "dist/a/b", Filename: "a/b", ID: "a", OsArch: &OsArch{OS: "linux", Arch: "386"}},
+			&Artifact{Location: "dist/a/b.exe", Filename: "a/b.exe", ID: "a", OsArch: &OsArch{OS: "windows", Arch: "386"}},
+			&Artifact{Location: "dist/a/c", Filename: "a/c", ID: "c", OsArch: &OsArch{OS: "linux", Arch: "386"}},
 		}, "a", 2},
 	}
 	for _, tt := range tests {

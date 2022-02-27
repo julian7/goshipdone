@@ -115,13 +115,10 @@ func (tar *goSingleTarget) Run(cx context.Context) error {
 	}
 
 	context.Artifacts.Add(&ctx.Artifact{
-		Arch:       tar.osarch.Arch,
-		ArchName:   tar.osarch.ArchName(),
-		ArmVersion: tar.osarch.ArmVersion,
-		Filename:   tar.Output,
-		Location:   output,
-		ID:         tar.ID,
-		OS:         tar.osarch.OS,
+		Filename: tar.Output,
+		Location: output,
+		ID:       tar.ID,
+		OsArch:   tar.osarch,
 	})
 
 	return nil

@@ -1,7 +1,6 @@
 package ctx
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -13,19 +12,16 @@ type (
 	// be further processed by later steps (eg. a build result put into
 	// an archive)
 	Artifact struct {
-		Arch       string
-		ArchName   string
-		ArmVersion int32
-		Filename   string
-		ID         string
-		Location   string
-		OS         string
+		*OsArch
+		Filename string
+		ID       string
+		Location string
 	}
 )
 
 // Add registers a new artifact in Artifacts
 func (arts *Artifacts) Add(artifact *Artifact) {
-	log.Printf("      storing artifact %s as %s (%s)", artifact.Filename, artifact.ID, artifact.OSArch())
+	log.Printf("      storing artifact %s as %s (%s)", artifact.Filename, artifact.ID, artifact.OsArch.String())
 	*arts = append(*arts, artifact)
 }
 
@@ -54,7 +50,7 @@ func (arts *Artifacts) OsArchByIDs(ids []string, skips []string) map[string]*Art
 
 	for _, id := range ids {
 		for _, art := range *arts.ByID(id) {
-			osarch := art.OSArch()
+			osarch := art.OsArch.String()
 			if _, ok := skipIndex[osarch]; ok {
 				continue
 			}
@@ -68,9 +64,4 @@ func (arts *Artifacts) OsArchByIDs(ids []string, skips []string) map[string]*Art
 	}
 
 	return builds
-}
-
-// OsArch returns artifact's os-arch string
-func (art *Artifact) OSArch() string {
-	return fmt.Sprintf("%s-%s", art.OS, art.ArchName)
 }

@@ -17,5 +17,9 @@ func (oa *OsArch) ArchName() string {
 }
 
 func (oa *OsArch) String() string {
+	if oa == nil {
+		return "noarch"
+	}
+
 	return fmt.Sprintf("%s-%s", oa.OS, oa.ArchName())
 }

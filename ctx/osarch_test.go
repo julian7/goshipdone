@@ -44,23 +44,28 @@ func TestOsarch_ArchName(t *testing.T) {
 func TestOsarch_String(t *testing.T) {
 	tests := []struct {
 		name     string
-		oa       ctx.OsArch
+		oa       *ctx.OsArch
 		archname string
 	}{
 		{
 			name:     "conventional architecture",
-			oa:       ctx.OsArch{OS: "conventional", Arch: "architecture"},
+			oa:       &ctx.OsArch{OS: "conventional", Arch: "architecture"},
 			archname: "conventional-architecture",
 		},
 		{
 			name:     "fake arm version",
-			oa:       ctx.OsArch{OS: "conventional", Arch: "architecture", ArmVersion: 2},
+			oa:       &ctx.OsArch{OS: "conventional", Arch: "architecture", ArmVersion: 2},
 			archname: "conventional-architecture",
 		},
 		{
 			name:     "real arm version",
-			oa:       ctx.OsArch{OS: "conventional", Arch: "arm", ArmVersion: 2},
+			oa:       &ctx.OsArch{OS: "conventional", Arch: "arm", ArmVersion: 2},
 			archname: "conventional-armv2",
+		},
+		{
+			name:     "no osarch allocated",
+			oa:       nil,
+			archname: "noarch",
 		},
 	}
 
