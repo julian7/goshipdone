@@ -22,7 +22,7 @@ type goSingleTarget struct {
 	LDFlags string
 	OutDir  string
 	Main    string
-	OSArch  *ctx.OsArch
+	osarch  *ctx.OsArch
 	Output  string
 }
 
@@ -32,7 +32,7 @@ func (mod *Go) newSingleTarget(goos, goarch string, goarm int32) *goSingleTarget
 		Env:    withenv.New(),
 		ID:     mod.ID,
 		Main:   mod.Main,
-		OSArch: &ctx.OsArch{OS: goos, Arch: goarch, ArmVersion: goarm},
+		osarch: &ctx.OsArch{OS: goos, Arch: goarch, ArmVersion: goarm},
 	}
 }
 
@@ -72,7 +72,7 @@ func (tar *goSingleTarget) Setup(cx context.Context) error {
 		return err
 	}
 
-	td.OSArch = tar.OSArch
+	td.OSArch = tar.osarch
 
 	for _, item := range tasks {
 		(*item.target), err = td.Parse("build:go", item.source)
@@ -85,20 +85,20 @@ func (tar *goSingleTarget) Setup(cx context.Context) error {
 }
 
 func (tar *goSingleTarget) SetGoEnv() {
-	tar.Env.Set("GOOS", tar.OSArch.OS)
-	tar.Env.Set("GOARCH", tar.OSArch.Arch)
+	tar.Env.Set("GOOS", tar.osarch.OS)
+	tar.Env.Set("GOARCH", tar.osarch.Arch)
 
-	if tar.OSArch.ArmVersion != 0 {
-		tar.Env.Set("GOARM", strconv.Itoa(int(tar.OSArch.ArmVersion)))
+	if tar.osarch.ArmVersion != 0 {
+		tar.Env.Set("GOARM", strconv.Itoa(int(tar.osarch.ArmVersion)))
 	}
 }
 
 func (tar *goSingleTarget) OSArch() string {
-	return tar.OSArch.String()
+	return tar.osarch.String()
 }
 
 func (tar *goSingleTarget) ArchName() string {
-	return tar.OSArch.ArchName()
+	return tar.osarch.ArchName()
 }
 
 func (tar *goSingleTarget) Run(cx context.Context) error {
@@ -115,13 +115,13 @@ func (tar *goSingleTarget) Run(cx context.Context) error {
 	}
 
 	context.Artifacts.Add(&ctx.Artifact{
-		Arch:       tar.OSArch.Arch,
-		ArchName:   tar.OSArch.ArchName(),
-		ArmVersion: tar.OSArch.ArmVersion,
+		Arch:       tar.osarch.Arch,
+		ArchName:   tar.osarch.ArchName(),
+		ArmVersion: tar.osarch.ArmVersion,
 		Filename:   tar.Output,
 		Location:   output,
 		ID:         tar.ID,
-		OS:         tar.OSArch.OS,
+		OS:         tar.osarch.OS,
 	})
 
 	return nil
