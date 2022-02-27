@@ -61,7 +61,7 @@ func (*GitLabService) New(
 		}))
 	}
 
-	client, err := gitlab.NewClient(token)
+	client, err := gitlab.NewClient(token, opts...)
 
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (c *GitLabClient) ProjectPath() string {
 }
 
 func (c *GitLabClient) ProjectID() string {
-	return strings.Replace(url.PathEscape(c.ProjectPath()), ".", "%2E", -1)
+	return strings.Replace(url.PathEscape(c.ProjectPath()), ".", "%2E", -1) // nolint:gocritic
 }
 
 func (rel *GitLabRelease) Release(name, notes string) error {

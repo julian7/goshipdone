@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
 	"regexp"
 
@@ -85,7 +86,7 @@ func (mod *CutChangelog) Run(cx context.Context) error {
 
 	outfile = path.Join(context.TargetDir, outfile)
 
-	if err := ioutil.WriteFile(outfile, matches[1], 0o644); err != nil {
+	if err := os.WriteFile(outfile, matches[1], 0o644); err != nil { // nolint: gosec
 		return fmt.Errorf("writing sliced CHANGELOG %s: %w", outfile, err)
 	}
 

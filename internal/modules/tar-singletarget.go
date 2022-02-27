@@ -38,6 +38,7 @@ func (mod *Tar) singleTarget(cx context.Context, artifacts *ctx.Artifacts) (*tar
 		},
 		Targets: artifacts,
 	}
+
 	for i := range mod.Files {
 		ret.Files[i] = mod.Files[i]
 	}
