@@ -5,14 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.6.0] - Feb 27, 2022
 
 Changed:
 
 - Separate Arch, ArchName, and ArmVersion, to allow sensulib modules to accurately
-  filter for ARM version in sensu asset filters.
+  filter for ARM version in sensu asset filters
 
-## [v0.5.0] - 2022-02-22
+## [v0.5.0] - Feb 22, 2022
 
 Added:
 
@@ -27,13 +27,13 @@ Fixed:
 
 - read from default token file. Fixes [#9](https://github.com/julian7/goshipdone/issues/9)
 
-## [v0.4.1] - 2019-12-13
+## [v0.4.1] - Dec 13, 2019
 
 Fixed:
 
 - publish:artifact ship context missing
 
-## [v0.4.0] - 2019-12-11
+## [v0.4.0] - Dec 11, 2019
 
 Added:
 
@@ -58,7 +58,7 @@ Removed:
 
 - publish:gitlab and publish:github, as publish:artifact already does that
 
-## [v0.3.0] - 2019-11-17
+## [v0.3.0] - Nov 17, 2019
 
 Added:
 
@@ -68,7 +68,7 @@ Fixed:
 
 - save tag name for future use
 
-## [v0.2.0] - 2019-11-17
+## [v0.2.0] - Nov 17, 2019
 
 Added:
 
@@ -87,7 +87,7 @@ Removed:
 
 - module dependencies
 
-## [v0.1.0] - 2019-11-16
+## [v0.1.0] - Nov 16, 2019
 
 Added:
 
@@ -106,7 +106,8 @@ Changed:
 - rename project to goshipdone
 - fold release_note into archive
 
-[Unreleased]: https://github.com/julian7/goshipdone/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/julian7/goshipdone/compare/v0.6.0...HEAD
+[v0.6.0]: https://github.com/julian7/goshipdone/compare/v0.5.0...v0.6.0
 [v0.5.0]: https://github.com/julian7/goshipdone/compare/v0.4.1...v0.5.0
 [v0.4.1]: https://github.com/julian7/goshipdone/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/julian7/goshipdone/compare/v0.3.0...v0.4.0
